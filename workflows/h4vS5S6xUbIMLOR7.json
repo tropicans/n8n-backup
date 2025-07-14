@@ -1,0 +1,474 @@
+{
+  "createdAt": "2025-06-26T02:47:01.721Z",
+  "updatedAt": "2025-07-02T03:06:43.066Z",
+  "id": "h4vS5S6xUbIMLOR7",
+  "name": "_PINTAR_5JudulCourse",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        -220
+      ],
+      "id": "4cb8081f-a03d-4bdd-85ac-44ef28c63d56",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "aeb6718a-fe10-49fa-8e79-6b794eb2a576",
+              "name": "transcript",
+              "value": "={{ $json.transcript }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -40,
+        -95
+      ],
+      "id": "b21282f8-002b-40f1-ab40-6fff9ebcc3f0",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ambil semua transcript\nconst all = items.map(item => item.json.transcript).join('\\n\\n');\n// keluarkan sebagai satu item baru\nreturn [\n  {\n    json: {\n      transcript: all\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        180,
+        -95
+      ],
+      "id": "11c6de0d-b60c-4405-9873-1ab50eee8d77",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Berdasarkan hasil analisis transkrip berikut:  \n{{ $json.transcript }}  \n\nBuatlah satu judul course yang menarik, singkat (maksimal 8–10 kata), dan menggunakan bahasa Indonesia yang memikat, mencerminkan esensi utama dari transkrip tersebut.",
+        "options": {
+          "systemMessage": "=Anda adalah agen AI spesialis dalam menganalisis transkrip pembicaraan dan menghasilkan judul course yang menarik dalam bahasa Indonesia.  \nFokus Anda adalah:  \n- Meringkas esensi dan poin-poin kunci dari transkrip.  \n- Mengubahnya menjadi satu judul course yang singkat, padat, dan memikat.  \n- Menggunakan bahasa Indonesia yang jelas, profesional, namun tetap menarik (memancing rasa ingin tahu).  \n- Memastikan judul mudah diingat dan mencerminkan konten utama dari transkrip."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        400,
+        -95
+      ],
+      "id": "a3c73ae3-2cd5-4628-a9df-7cab1fe03ff2",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        488,
+        125
+      ],
+      "id": "e031bd7a-e521-4703-bd44-52af86f82499",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "JUjXarPUY9EoEB7c",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// untuk setiap item, bersihkan spasi\nreturn items.map(item => {\n  const text = item.json.output;\n  // ganti semua whitespace berlebih jadi satu spasi, lalu trim\n  item.json.output = text.replace(/\\s+/g, ' ').trim();\n  return item;\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        776,
+        -95
+      ],
+      "id": "0b1dea6e-bc66-4db9-aaca-960c7a2605e3",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a47742e2-4917-4d59-8571-a8fa13cc3067",
+              "name": "judulcourse",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        996,
+        -95
+      ],
+      "id": "849c9a54-81ea-4bbe-993e-75dd3057bb74",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1220,
+        -220
+      ],
+      "id": "a64d9c4d-52d3-46b0-b185-819b1b145432",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      No: 1,\n      ...items[0].json,\n      ...items[1].json\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1436,
+        -220
+      ],
+      "id": "4bdbc4d1-53b9-4898-9520-abc49854a34d",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.GoogleSheetFileID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $json.SheetIDRaw }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -260,
+        -95
+      ],
+      "id": "2c4c0be2-8ef9-42ca-a7ee-2ccd0a9101da",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EvJFGzn1Pb9TRY0E",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.GoogleSheetFileID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $json.SheetIDCourseData }}",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "No": "={{ $json.No }}",
+            "judulcourse": "={{ $json.judulcourse }}"
+          },
+          "matchingColumns": [
+            "No"
+          ],
+          "schema": [
+            {
+              "id": "No",
+              "displayName": "No",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "judulcourse",
+              "displayName": "judulcourse",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "JP",
+              "displayName": "JP",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "CouseShortDesc",
+              "displayName": "CouseShortDesc",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "CourseDesc",
+              "displayName": "CourseDesc",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Requirements",
+              "displayName": "Requirements",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Outcomes",
+              "displayName": "Outcomes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "MetaKeys",
+              "displayName": "MetaKeys",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "MetaDesc",
+              "displayName": "MetaDesc",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Sections",
+              "displayName": "Sections",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "KC",
+              "displayName": "KC",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "fileprepost",
+              "displayName": "fileprepost",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1656,
+        -220
+      ],
+      "id": "10ed382e-53c4-429e-978e-96a47291b13e",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EvJFGzn1Pb9TRY0E",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "64c0d9e6-905a-4e64-89c0-acf4170cf7e9",
+  "triggerCount": 0,
+  "tags": []
+}

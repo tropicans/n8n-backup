@@ -1,0 +1,533 @@
+{
+  "createdAt": "2025-06-23T01:51:05.200Z",
+  "updatedAt": "2025-07-02T03:06:50.306Z",
+  "id": "lXWyR33mwaJCLiH8",
+  "name": "_PINTAR_9pre/posttest",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -380
+      ],
+      "id": "017faa90-6596-4aee-98c7-7dffe87fe716",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "aeb6718a-fe10-49fa-8e79-6b794eb2a576",
+              "name": "transcript",
+              "value": "={{ $json.transcript }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        440,
+        -255
+      ],
+      "id": "13bc6dab-2d81-4729-85cc-e64650898fe6",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ambil semua transcript\nconst all = items.map(item => item.json.transcript).join('\\n\\n');\n// keluarkan sebagai satu item baru\nreturn [\n  {\n    json: {\n      transcript: all\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        -255
+      ],
+      "id": "8b0ef197-e85c-4c41-ae7b-f58fe07344cc",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Buatlah total 30 soal pilihan ganda berbasis isi berikut:\n\n\"{{ $json.transcript }}\"\n\nGunakan format AIKEN **tanpa markdown**, tanpa nomor soal, tanpa penjelasan tambahan. Distribusi:\n- 40% Mudah (12 soal)\n- 40% Sedang (12 soal)\n- 20% Sulit (6 soal)\n\nFormat:\nPertanyaan?\nA. Pilihan A\nB. Pilihan B\nC. Pilihan C\nD. Pilihan D\nANSWER: B\n\nCatatan penting:\n- Jangan gunakan tanda * (italic), ** (bold), _ (underscore), atau simbol format lainnya\n- Jangan gunakan nomor soal\n- Jangan berikan pembuka atau penutup\n- Output hanya berupa soal dalam format AIKEN murni, siap parsing di CLI atau LMS",
+        "options": {
+          "systemMessage": "=Kamu adalah pembuat soal pilihan ganda format AIKEN berbasis transkrip. Hanya buat soal dari isi transkrip. Jangan menggunakan format markdown seperti tanda bintang atau underscore. Jangan gunakan nomor soal. Gunakan bahasa Indonesia formal. Hasil akhir hanya berupa soal dalam format AIKEN, tanpa tambahan apa pun."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        880,
+        -260
+      ],
+      "id": "e3b9fed4-a806-4b80-baeb-2a0b59ae64a3",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        968,
+        -35
+      ],
+      "id": "46b372f7-dada-4f1e-af7c-634ce75679d2",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "zpk4zLtRgRK5YOpA",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9b217302-66b2-4edc-b0e6-f10838a8999b",
+              "name": "text",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "4aecd17b-410a-430f-8248-f6ee2217b4de",
+              "name": "filename",
+              "value": "={{ 'soal_aiken_' + new Date().toISOString().replace(/[:.]/g, '_') + '.txt' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1256,
+        -255
+      ],
+      "id": "619bd18f-b2fd-40dd-a18f-4da26ef2a515",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/data/shared/pintar/prepost/{{ $('Edit Fields1').item.json.filename }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1696,
+        -255
+      ],
+      "id": "895e8d45-e0cf-445e-9c5e-2b14d24b52f8",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "text",
+        "options": {
+          "fileName": "={{ $json.filename }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1476,
+        -255
+      ],
+      "id": "2f8fa599-8e46-4b05-ade4-35f343f3edfc",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1920,
+        -380
+      ],
+      "id": "589d6b30-1517-463c-8ee1-224ab3d60e30",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      No: 1,\n      ...items[0].json,\n      ...items[1].json\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2140,
+        -380
+      ],
+      "id": "1521e790-fd4b-4ba2-b615-11f7c48684cc",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.GoogleSheetFileID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1705003066,
+          "mode": "list",
+          "cachedResultName": "Raw",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yYZdIIiujOBqwQJ5yh0AqywzT4WjLxJVFcjUdVzpU_g/edit#gid=1705003066"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        220,
+        -255
+      ],
+      "id": "6f74b2a3-dc58-455a-b05b-dfadd05b932f",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EvJFGzn1Pb9TRY0E",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.GoogleSheetFileID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 908912674,
+          "mode": "list",
+          "cachedResultName": "CourseData",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yYZdIIiujOBqwQJ5yh0AqywzT4WjLxJVFcjUdVzpU_g/edit#gid=908912674"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "No": "={{ $json.No }}",
+            "fileprepost": "={{ $json.fileName }}"
+          },
+          "matchingColumns": [
+            "No"
+          ],
+          "schema": [
+            {
+              "id": "No",
+              "displayName": "No",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "judulcourse",
+              "displayName": "judulcourse",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "JP",
+              "displayName": "JP",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CouseShortDesc",
+              "displayName": "CouseShortDesc",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CourseDesc",
+              "displayName": "CourseDesc",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Requirements",
+              "displayName": "Requirements",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Outcomes",
+              "displayName": "Outcomes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "MetaKeys",
+              "displayName": "MetaKeys",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "MetaDesc",
+              "displayName": "MetaDesc",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Sections",
+              "displayName": "Sections",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "KC",
+              "displayName": "KC",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fileprepost",
+              "displayName": "fileprepost",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        2360,
+        -380
+      ],
+      "id": "80585908-05e0-47fa-ae76-09260ee11262",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EvJFGzn1Pb9TRY0E",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "AI Agent": [
+      {
+        "json": {
+          "output": "Apa yang menjadi tema utama pembahasan dalam transkrip tersebut?\nA. Manajemen waktu efektif\nB. Mengelola pekerjaan dan kehidupan pribadi\nC. Strategi meningkatkan produktivitas kerja\nD. Teknik mindfulness untuk mengurangi stres\nANSWER: B\n\nSalah satu kesulitan dalam menyeimbangkan pekerjaan dan kehidupan pribadi di masa pandemi adalah?\nA.  Kurangnya fasilitas kerja dari rumah\nB.  Kaburnya batasan antara waktu kerja dan waktu pribadi\nC.  Meningkatnya tuntutan pekerjaan di kantor\nD.  Sulitnya beradaptasi dengan teknologi baru\nANSWER: B\n\nKonflik berbasis tegangan dalam konteks work-life balance adalah?\nA.  Kesulitan membagi waktu antara pekerjaan dan keluarga\nB.  Perbedaan perilaku antara peran di rumah dan di kantor\nC.  Masalah di satu area memengaruhi area lainnya\nD.  Ketidaksesuaian jadwal kerja dengan jadwal keluarga\nANSWER: C\n\nApa yang sering ditelantarkan akibat tuntutan pekerjaan yang tinggi?\nA.  Kesehatan fisik\nB.  Kesejahteraan finansial\nC.  Urusan pribadi\nD.  Hubungan sosial\nANSWER: C\n\nSalah satu dampak negatif dari ketidakseimbangan work-life balance adalah?\nA.  Meningkatnya pendapatan\nB.  Peningkatan kepuasan kerja\nC.  Penurunan kinerja di tempat kerja\nD.  Meningkatnya produktivitas\nANSWER: C\n\nApa yang dimaksud dengan konflik berbasis perilaku (behavior-based conflict)?\nA.  Ketidaksesuaian jadwal antara pekerjaan dan keluarga\nB.  Ketidaksesuaian kepribadian atau perilaku antara peran di rumah dan di kantor\nC.  Kesulitan membagi waktu secara efektif\nD.  Beban kerja yang berat\nANSWER: B\n\n\nManakah yang BUKAN faktor pekerjaan yang meningkatkan risiko ketidakseimbangan work-life balance?\nA.  Jadwal kerja yang tidak terprediksi\nB.  Dukungan keluarga yang kurang\nC.  Beban kerja yang berat\nD.  Lingkungan kerja yang penuh tekanan\nANSWER: B\n\nManakah yang BUKAN faktor kepribadian yang meningkatkan risiko ketidakseimbangan work-life balance?\nA.  Sifat perfeksionis\nB.  Motivasi kerja yang tinggi\nC.  Rendah diri\nD.  Kurang proaktif\nANSWER: B\n\nManakah yang BUKAN faktor keluarga yang meningkatkan risiko ketidakseimbangan work-life balance?\nA.  Memiliki banyak anak kecil\nB.  Kurangnya dukungan dari pasangan\nC.  Lingkungan kerja yang toxic\nD.  Tingginya stres keluarga\nANSWER: C\n\nIstilah apa yang lebih tepat digunakan untuk menggambarkan hubungan pekerjaan dan kehidupan pribadi di era pandemi?\nA.  Work-Life Balance\nB.  Work-Life Integration\nC.  Work-Life Separation\nD.  Work-Life Equilibrium\nANSWER: B\n\nMultitasking dapat menurunkan efisiensi kinerja otak hingga berapa persen?\nA.  10%\nB.  20%\nC.  30%\nD.  40%\nANSWER: D\n\nApa arti dari \"mindfulness\"?\nA.  Kemampuan untuk fokus pada satu hal dalam waktu yang lama\nB.  Kemampuan untuk berpikir secara sistematis dan terstruktur\nC.  Kesadaran dan kehadiran penuh di masa sekarang\nD.  Kemampuan untuk memprediksi kejadian di masa depan\nANSWER: C\n\nApa yang dimaksud dengan \"moment-to-moment attention\" dalam konteks mindfulness?\nA.  Memikirkan masa depan\nB.  Memikirkan masa lalu\nC.  Fokus pada aktivitas yang sedang dikerjakan tanpa gangguan pikiran lain\nD.  Menghindari tanggung jawab\nANSWER: C\n\n\nBerdasarkan transkrip, apa yang harus dilakukan jika suatu pekerjaan penting tetapi tidak urgent?\nA.  Lakukan segera\nB.  Delegasikan kepada orang lain\nC.  Tunda atau rencanakan untuk melakukannya nanti\nD.  Lupakan saja\nANSWER: C\n\nMenurut transkrip, apa yang harus dilakukan jika suatu pekerjaan tidak penting dan tidak urgent?\nA.  Lakukan segera\nB.  Delegasikan kepada orang lain\nC.  Tunda atau rencanakan untuk melakukannya nanti\nD.  Lupakan saja\nANSWER: D\n\nApa yang menyebabkan kesulitan dalam menyeimbangkan pekerjaan dan kehidupan pribadi menurut transkrip?\nA.  Perencanaan yang buruk\nB.  Kurangnya dukungan teknologi\nC.  Kurangnya komitmen\nD.  Konflik antara tuntutan pekerjaan dan kebutuhan pribadi\nANSWER: D\n\n\nApa yang dimaksud dengan \"fully engaged\" dalam konteks *work-life integration*?\nA.  Melakukan banyak hal secara bersamaan\nB.  Fokus penuh pada aktivitas yang sedang dikerjakan\nC.  Membagi waktu secara merata\nD.  Memiliki banyak waktu luang\nANSWER: B\n\nPenulis transkrip menyarankan untuk mengatasi pikiran yang melayang dengan cara?\nA.  Mengabaikannya\nB.  Menghukum diri sendiri\nC.  Menghitungnya dan kembali fokus\nD.  Mencari hiburan\nANSWER: C\n\nSalah satu cara menerapkan mindfulness dalam pekerjaan adalah?\nA.  Multitasking\nB.  Bekerja hingga kelelahan\nC.  Istirahat secara berkala\nD.  Membiarkan diri terbebani\nANSWER: C\n\nApa yang harus dilakukan setelah menyelesaikan pekerjaan menurut transkrip?\nA.  Langsung memulai pekerjaan lain\nB.  Berhenti bekerja dan beristirahat\nC.  Memikirkan pekerjaan selanjutnya\nD.  Membandingkan diri dengan orang lain\nANSWER: B\n\nApa yang lebih penting dalam hal keseimbangan work-life balance, menurut transkrip?\nA.  Waktu\nB.  Uang\nC.  Keseimbangan antara pekerjaan dan kehidupan pribadi\nD.  Kecepatan menyelesaikan pekerjaan\nANSWER: C\n\nMengapa penting untuk fokus pada aktivitas saat ini?\nA.  Agar terlihat sibuk\nB.  Agar dapat menyelesaikan pekerjaan lebih cepat dan efektif\nC.  Agar dapat mengesankan atasan\nD.  Agar dapat melakukan multitasking\nANSWER: B\n\n\nMenurut transkrip, apa yang harus dilakukan jika pekerjaan tidak penting bagi Anda tetapi urgent?\nA.  Lakukan segera\nB.  Delegasikan kepada orang lain\nC.  Tunda\nD.  Lupakan\nANSWER: B\n\nStudi di Brian College menunjukkan kerugian berapa juta per tahun akibat multitasking karyawan?\nA.  100 juta\nB.  250 juta\nC.  450 juta\nD.  500 juta\nANSWER: C\n\nApa konsekuensi jika kita melewatkan rapat?\nA.  Mendapatkan bonus\nB.  Dimarahi atasan atau tidak mendapat gaji\nC.  Mendapatkan promosi jabatan\nD.  Mendapatkan cuti tambahan\nANSWER: B\n\nApa yang terjadi jika kita menelantarkan urusan pribadi?\nA.  Kenaikan gaji\nB.  Dampak negatif pada kesejahteraan\nC.  Promosi jabatan\nD.  Meningkatnya kepuasan hidup\nANSWER: B\n\nPenulis transkrip menyarankan untuk mengatasi ketidakseimbangan work-life balance dengan cara?\nA.  Mengabaikan masalah\nB.  Bekerja lebih keras\nC.  Mencari strategi untuk menyeimbangkan kedua aspek kehidupan\nD.  Mencari pekerjaan baru\nANSWER: C\n\nBerapa skor total yang menunjukkan tanda bahaya (lampu merah) dalam evaluasi work-life balance?\nA. 0-2\nB. 3-7\nC. Di atas 7\nD. 7\nANSWER: C\n\n"
+        }
+      }
+    ],
+    "Code1": [
+      {
+        "json": {
+          "No": 1,
+          "SheetName": "Raw",
+          "GoogleSheetFileID": "1yYZdIIiujOBqwQJ5yh0AqywzT4WjLxJVFcjUdVzpU_g",
+          "fileName": "/data/shared/pintar/prepost/soal_aiken_2025-06-30T03_13_28_813Z.txt"
+        }
+      }
+    ]
+  },
+  "versionId": "e56293f2-f5b5-46d9-8a79-85e9e7a742aa",
+  "triggerCount": 0,
+  "tags": []
+}

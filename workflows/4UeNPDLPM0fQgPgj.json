@@ -1,0 +1,659 @@
+{
+  "createdAt": "2025-07-01T04:32:55.461Z",
+  "updatedAt": "2025-07-02T03:07:12.345Z",
+  "id": "4UeNPDLPM0fQgPgj",
+  "name": "YTAnalyticsBYHashtags1",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a1c536a5-bac2-4421-9c57-83deaa662775",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        220,
+        0
+      ],
+      "id": "414f56cc-e201-490c-881c-cc906605858d",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analisa video berikut dan berikan insight kenapa bisa viral, serta strategi jika channel lain ingin membuat video seperti ini.\nData video:\nJudul: {{$json.title}}\nViews: {{$json.viewCount}}\nSubscriber: {{$json.subscriberCount}}\nRasio views/subscriber: {{$json.ratioViewSub}}\nLike: {{$json.likeCount}}, Komentar: {{$json.commentCount}}\nLike/view: {{$json.ratioLikeView}}\nUpload: {{$json.daysAgo}} hari lalu\nBaru upload? {{$json.isNew}}\nMengandung kata viral/trending? {{$json.viralWords}}\nALL CAPS? {{$json.allCaps}}\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "c3b974cd-2817-4146-a08f-96a47f6b4101",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "output"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        518,
+        -300
+      ],
+      "id": "e782f541-4d41-486e-b108-1c7936d7a968",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1412,
+        75
+      ],
+      "id": "abad25fc-602b-471e-968d-c123265bc21b",
+      "name": "Wait",
+      "webhookId": "82857c10-d330-43e3-b4df-561e45381c13"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Berikut adalah insight per video dari hasil riset YouTube minggu ini:\n\n{{ $json.output }}\n\nBuatlah rangkuman pola-pola utama yang ditemukan, strategi utama yang harus diikuti channel lain, dan checklist aksi konkret agar channel bisa viral seperti mereka.  \nBerikan juga 5 ide judul atau konsep video baru yang berpotensi viral untuk niche ini.\nTampilkan insight dan strategi dengan bahasa yang praktis, padat, dan mudah dipahami.\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        816,
+        -400
+      ],
+      "id": "6bbc5d6b-039d-4da2-8a61-a1ab295beed5",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "google/gemma-3-27b-it:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        904,
+        -180
+      ],
+      "id": "bb7be8b6-5719-4a35-bd12-2b6bf3a444fe",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "C0QLoy5gnSdSufC0",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4f494c87-fb6c-460a-95fc-208230bf1634",
+              "name": "No",
+              "value": "={{ $('When clicking ‘Execute workflow’').item.json.No }}",
+              "type": "number"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        894,
+        0
+      ],
+      "id": "016e4182-e1aa-42c7-a716-3caf92db52c9",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1As4bE1rLoxxWfW-tQ7LkYrvSue9fx9bH-uYaA9d9W0U",
+          "mode": "list",
+          "cachedResultName": "analisisvideo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1As4bE1rLoxxWfW-tQ7LkYrvSue9fx9bH-uYaA9d9W0U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1As4bE1rLoxxWfW-tQ7LkYrvSue9fx9bH-uYaA9d9W0U/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "No": "={{ $json.No }}",
+            "analisis": "={{ $json.output }}"
+          },
+          "matchingColumns": [
+            "No"
+          ],
+          "schema": [
+            {
+              "id": "No",
+              "displayName": "No",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "hashtag",
+              "displayName": "hashtag",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "videoUrl",
+              "displayName": "videoUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "channelTitle",
+              "displayName": "channelTitle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "viewCount",
+              "displayName": "viewCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "subscriberCount",
+              "displayName": "subscriberCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "daysAgo",
+              "displayName": "daysAgo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "isNew",
+              "displayName": "isNew",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "viralWords",
+              "displayName": "viralWords",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "allCaps",
+              "displayName": "allCaps",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ratioViewSub",
+              "displayName": "ratioViewSub",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ratioLikeView",
+              "displayName": "ratioLikeView",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "likeCount",
+              "displayName": "likeCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "commentCount",
+              "displayName": "commentCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "publishedAt",
+              "displayName": "publishedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "analisis",
+              "displayName": "analisis",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1192,
+        0
+      ],
+      "id": "3c4dc34c-dea0-4c8f-a54a-f940c19efaad",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EvJFGzn1Pb9TRY0E",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "When clicking ‘Execute workflow’": [
+      {
+        "json": {
+          "No": 1,
+          "hashtag": "alurcerita",
+          "title": "SKEMA BALAS DENDAM PALING JENIUS DARI KRIPTOGRAFI CULUN - THE AMATEUR 2025",
+          "videoUrl": "https://youtube.com/watch?v=CBGaVsYnrHE",
+          "channelTitle": "Mr. Babao",
+          "viewCount": 712981,
+          "subscriberCount": 85200,
+          "daysAgo": 18,
+          "isNew": false,
+          "viralWords": true,
+          "allCaps": true,
+          "ratioViewSub": "8.37",
+          "ratioLikeView": "0.01",
+          "likeCount": 8296,
+          "commentCount": 762,
+          "publishedAt": "2025-06-12T10:20:01Z"
+        }
+      },
+      {
+        "json": {
+          "No": 2,
+          "hashtag": "alurcerita",
+          "title": "Pulau Yang Mereka Kunjungi Ternyata Dihuni Buaya Super Raksasa - ALUR CERITA FILM",
+          "videoUrl": "https://youtube.com/watch?v=wI7brTwZ21o",
+          "channelTitle": "Y&D Storyline",
+          "viewCount": 474059,
+          "subscriberCount": 202000,
+          "daysAgo": 20,
+          "isNew": false,
+          "viralWords": false,
+          "allCaps": false,
+          "ratioViewSub": "2.35",
+          "ratioLikeView": "0.01",
+          "likeCount": 5551,
+          "commentCount": 230,
+          "publishedAt": "2025-06-10T11:55:01Z"
+        }
+      },
+      {
+        "json": {
+          "No": 3,
+          "hashtag": "alurcerita",
+          "title": "Kalau kayak gini dijamin langsung ngaku #shortvideo #viralvideo #alurcerita #selingkuh",
+          "videoUrl": "https://youtube.com/watch?v=X8mr-77LpvI",
+          "channelTitle": "Nadia Elrani",
+          "viewCount": 23216644,
+          "subscriberCount": 187000,
+          "daysAgo": 8,
+          "isNew": false,
+          "viralWords": true,
+          "allCaps": false,
+          "ratioViewSub": "124.15",
+          "ratioLikeView": "0.02",
+          "likeCount": 558248,
+          "commentCount": 234,
+          "publishedAt": "2025-06-22T12:55:07Z"
+        }
+      },
+      {
+        "json": {
+          "No": 4,
+          "hashtag": "alurcerita",
+          "title": "MENEMUKAN DUNIA TERSEMBUNYI KETIKA MENJELAJAHI HUTAN AMAZON / ALUR CERITA FILM TERBARU 2025",
+          "videoUrl": "https://youtube.com/watch?v=dKKz0IgumDc",
+          "channelTitle": "1DAY FILM",
+          "viewCount": 72942,
+          "subscriberCount": 173000,
+          "daysAgo": 5,
+          "isNew": true,
+          "viralWords": true,
+          "allCaps": true,
+          "ratioViewSub": "0.42",
+          "ratioLikeView": "0.01",
+          "likeCount": 670,
+          "commentCount": 65,
+          "publishedAt": "2025-06-25T12:10:36Z"
+        }
+      },
+      {
+        "json": {
+          "No": 5,
+          "hashtag": "alurcerita",
+          "title": "Jagoan Kita Semua Kembali - ALUR CERITA FILM",
+          "videoUrl": "https://youtube.com/watch?v=sNOlyxx3rkQ",
+          "channelTitle": "Y&D Storyline",
+          "viewCount": 125186,
+          "subscriberCount": 202000,
+          "daysAgo": 22,
+          "isNew": false,
+          "viralWords": true,
+          "allCaps": false,
+          "ratioViewSub": "0.62",
+          "ratioLikeView": "0.01",
+          "likeCount": 1316,
+          "commentCount": 48,
+          "publishedAt": "2025-06-08T13:00:39Z"
+        }
+      },
+      {
+        "json": {
+          "No": 6,
+          "hashtag": "alurcerita",
+          "title": "INILAH PEMBALASAN EPIC  ANGGOTA PASUKAN KHUSUS - Alur cerita film The A team",
+          "videoUrl": "https://youtube.com/watch?v=fZOHWmqILyM",
+          "channelTitle": "Mager Santay",
+          "viewCount": 357452,
+          "subscriberCount": 406000,
+          "daysAgo": 33,
+          "isNew": false,
+          "viralWords": false,
+          "allCaps": false,
+          "ratioViewSub": "0.88",
+          "ratioLikeView": "0.01",
+          "likeCount": 2911,
+          "commentCount": 101,
+          "publishedAt": "2025-05-28T11:52:44Z"
+        }
+      },
+      {
+        "json": {
+          "No": 7,
+          "hashtag": "alurcerita",
+          "title": "Bermodalkan Sendok 49 Tahanan Jenius Kabur Dari Penjara Super Sadis Yang Ketat - Alur Cerita Film",
+          "videoUrl": "https://youtube.com/watch?v=82ocy58WfWg",
+          "channelTitle": "Melong Film",
+          "viewCount": 928349,
+          "subscriberCount": 319000,
+          "daysAgo": 317,
+          "isNew": false,
+          "viralWords": false,
+          "allCaps": false,
+          "ratioViewSub": "2.91",
+          "ratioLikeView": "0.01",
+          "likeCount": 6177,
+          "commentCount": 148,
+          "publishedAt": "2024-08-17T12:01:13Z"
+        }
+      },
+      {
+        "json": {
+          "No": 8,
+          "hashtag": "alurcerita",
+          "title": "MUNCULNYA WABAH MISTERIUS YANG MEMBUAT UMAT MANUSIA PERLAHAN MENGALAMI KEPUNAHAN | Alur Cerita Film",
+          "videoUrl": "https://youtube.com/watch?v=Xxr3XTq4Idc",
+          "channelTitle": "Ngomongin Film",
+          "viewCount": 299855,
+          "subscriberCount": 1000000,
+          "daysAgo": 33,
+          "isNew": false,
+          "viralWords": false,
+          "allCaps": false,
+          "ratioViewSub": "0.30",
+          "ratioLikeView": "0.01",
+          "likeCount": 3333,
+          "commentCount": 176,
+          "publishedAt": "2025-05-28T09:34:04Z"
+        }
+      },
+      {
+        "json": {
+          "No": 9,
+          "hashtag": "alurcerita",
+          "title": "Dikira Kurir Paket Biasa! Ternyata Pasukan Khusus Paling Berbahaya! alur cerita film Jason Statham",
+          "videoUrl": "https://youtube.com/watch?v=HmdnnRbwr4o",
+          "channelTitle": "NOBAR",
+          "viewCount": 57531,
+          "subscriberCount": 1380000,
+          "daysAgo": 0,
+          "isNew": true,
+          "viralWords": false,
+          "allCaps": false,
+          "ratioViewSub": "0.04",
+          "ratioLikeView": "0.02",
+          "likeCount": 1188,
+          "commentCount": 117,
+          "publishedAt": "2025-06-30T12:00:38Z"
+        }
+      },
+      {
+        "json": {
+          "No": 10,
+          "hashtag": "alurcerita",
+          "title": "FEMALE TITAN MASIH HIDUP #alurceritafilmpendek #rangkumfilm",
+          "videoUrl": "https://youtube.com/watch?v=B6ju87HZEcg",
+          "channelTitle": "Elgenduk",
+          "viewCount": 13092767,
+          "subscriberCount": 684000,
+          "daysAgo": 30,
+          "isNew": false,
+          "viralWords": true,
+          "allCaps": false,
+          "ratioViewSub": "19.14",
+          "ratioLikeView": "0.01",
+          "likeCount": 121412,
+          "commentCount": 592,
+          "publishedAt": "2025-06-01T03:00:20Z"
+        }
+      }
+    ]
+  },
+  "versionId": "8b12f999-611d-421f-86ef-e1baf459952c",
+  "triggerCount": 0,
+  "tags": []
+}

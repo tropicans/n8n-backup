@@ -1,0 +1,66 @@
+{
+  "createdAt": "2025-06-30T07:45:41.865Z",
+  "updatedAt": "2025-06-30T08:08:32.169Z",
+  "id": "QLOpE9GjCpVDwXJf",
+  "name": "My workflow 2",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "0d70e377-32d3-42fa-9ca0-a53b0656cdc5",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "02fdde2d-5d17-4e77-ad03-e1355c07c31c",
+              "name": "keyword",
+              "value": "motivation",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ],
+      "id": "1fed0559-5bc0-485c-887f-cee4a97e7c52",
+      "name": "Edit Fields"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "c53940a4-4ac3-47ff-b550-3eb06c0f3f6c",
+  "triggerCount": 0,
+  "tags": []
+}

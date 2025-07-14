@@ -1,0 +1,294 @@
+{
+  "createdAt": "2025-06-02T07:41:40.847Z",
+  "updatedAt": "2025-07-02T03:07:33.655Z",
+  "id": "u656DlfMsKkrLzTS",
+  "name": "AddSpeech",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        -780
+      ],
+      "id": "4b2d0008-9789-4dac-86bc-ff0b578d7804",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d72ff848-b36c-4d0c-8fc9-54345645d187",
+              "name": "text",
+              "value": "={{ $json['ScriptSegment'] }}",
+              "type": "string"
+            },
+            {
+              "id": "195d5502-0dc4-4ca3-bbe9-cc591464bcda",
+              "name": "filename",
+              "value": "={{$json['No']}}.mp3",
+              "type": "string"
+            },
+            {
+              "id": "4c21015c-342e-41f7-951e-6b6f8e076846",
+              "name": "spreadsheetId",
+              "value": "={{ $json.spreadsheetId }}",
+              "type": "string"
+            },
+            {
+              "id": "6970cc0e-f988-4f9c-9f52-334981da06c0",
+              "name": "sheetId",
+              "value": "={{ $json.sheetId }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        760,
+        -755
+      ],
+      "id": "1a064982-7bca-4f8c-8dbc-5c89a64a3644",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://kokoro-tts:8880/v1/audio/speech",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"kokoro\",\n  \"input\": {{ JSON.stringify($json.text) }},\n  \"voice\": \"af_heart\",\n  \"response_format\": \"mp3\",\n  \"download_format\": \"mp3\",\n  \"speed\": 1,\n  \"stream\": true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        980,
+        -755
+      ],
+      "id": "e795791b-ad4e-48e2-938a-ef3ab6e5bd4f",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/data/shared/content/{{ $('Loop Over Items').item.json.foldername }}/audio/{{$json[\"filename\"]}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        -755
+      ],
+      "id": "2ffa85bd-0f04-44ef-ae2c-6a58fa6c3342",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        540,
+        -680
+      ],
+      "id": "275093ff-fd4d-4ca0-9d13-14f8f0595f96",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8560e76c-fdfa-4cdc-8b7f-3b0e50b195c8",
+              "name": "foldername",
+              "value": "={{ (() => {\n  const judul = $json.Judul || \"untitled\";\n\n  return judul\n    .slice(0, 50)\n    .replace(/[<>:\"/\\\\|?*\\x00-\\x1F]/g, \"\")     // hapus karakter ilegal\n    .replace(/[^a-zA-Z0-9]+/g, \"_\")            // semua non-alfanumerik → 1 underscore\n    .replace(/^_+|_+$/g, \"\")                   // hapus underscore di awal/akhir\n    .trim();\n})() }}",
+              "type": "string"
+            },
+            {
+              "id": "84111f6a-f156-4d81-ade3-27626c9e0b8b",
+              "name": "No",
+              "value": "={{ $json.No }}",
+              "type": "string"
+            },
+            {
+              "id": "29746668-a14f-473b-9fbb-2f38cec032a3",
+              "name": "TTMPrompt",
+              "value": "={{ $json.TTMPrompt }}",
+              "type": "string"
+            },
+            {
+              "id": "a137e157-5960-48a7-8b43-bf5ac0c16eb2",
+              "name": "ScriptSegment",
+              "value": "={{ $json.ScriptSegment }}",
+              "type": "string"
+            },
+            {
+              "id": "1010c411-a29c-4ebd-b00d-26baa4fbeffd",
+              "name": "Status",
+              "value": "={{ $json.Status }}",
+              "type": "string"
+            },
+            {
+              "id": "f90b7a84-1997-4d70-8e93-3a81a32f5d34",
+              "name": "spreadsheetId",
+              "value": "={{ $json.spreadsheetId }}",
+              "type": "string"
+            },
+            {
+              "id": "5108caa5-dafc-4220-974e-0b729604aeb7",
+              "name": "sheetId",
+              "value": "={{ $json.sheetId }}",
+              "type": "number"
+            },
+            {
+              "id": "65369d8b-572d-489a-8ecc-3be921edc95b",
+              "name": "Judul",
+              "value": "={{ $json.Judul }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        320,
+        -780
+      ],
+      "id": "f35091b0-547e-44a2-8a32-10d5dae76447",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "command": "={{ \n  `mkdir -p \"/data/shared/content/${$json.foldername}/audio\"`\n}}"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        540,
+        -880
+      ],
+      "id": "6d4daed2-7322-42a4-9cec-265fd982061a",
+      "name": "Execute Command"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1420,
+        -680
+      ],
+      "id": "f144eed3-ef72-42d4-9555-adfb8a0b1499",
+      "name": "Wait",
+      "webhookId": "d22c9b9d-36da-4e3b-bf44-07e8f33d7bdf"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "26e0600f-8f15-4c26-b4fb-01310b2e703b",
+  "triggerCount": 0,
+  "tags": []
+}
