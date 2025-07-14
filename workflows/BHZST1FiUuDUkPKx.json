@@ -1,8 +1,8 @@
 {
   "createdAt": "2025-07-14T04:02:53.285Z",
-  "updatedAt": "2025-07-14T04:05:11.867Z",
+  "updatedAt": "2025-07-14T04:08:39.651Z",
   "id": "BHZST1FiUuDUkPKx",
-  "name": "My workflow 7",
+  "name": "n8n backup",
   "active": false,
   "isArchived": false,
   "nodes": [
@@ -128,7 +128,7 @@
     },
     {
       "parameters": {
-        "command": "npx n8n export:workflow --backup --output repo/workflows/\n"
+        "command": "npx n8n export:workflow --backup --output n8n-backup/workflows/"
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
@@ -141,7 +141,7 @@
     },
     {
       "parameters": {
-        "command": "npx n8n export:credentials --backup --output repo/credentials/"
+        "command": "npx n8n export:credentials --backup --output n8n-backup/credentials/"
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
@@ -154,7 +154,7 @@
     },
     {
       "parameters": {
-        "command": "=git -C . add repo/"
+        "command": "=git -C n8n-backup add ."
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
@@ -167,7 +167,7 @@
     },
     {
       "parameters": {
-        "command": "=git -C repo commit -m \"Auto backup ($(date -Iseconds))\""
+        "command": "=git -C n8n-backup commit -m \"Auto backup ($(date -Iseconds))\""
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
@@ -306,7 +306,7 @@
   "staticData": null,
   "meta": null,
   "pinData": {},
-  "versionId": "46342b0a-bf0f-487f-aadc-a4756a15826e",
+  "versionId": "46c63395-771f-48bc-b4f8-301f9864910c",
   "triggerCount": 0,
   "tags": []
 }

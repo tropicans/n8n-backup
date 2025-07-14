@@ -1,8 +1,8 @@
 {
-  "createdAt": "2025-07-14T02:08:25.393Z",
-  "updatedAt": "2025-07-14T04:09:50.876Z",
-  "id": "04cS5mR7v0ii2Psh",
-  "name": "My workflow 6",
+  "createdAt": "2025-07-14T04:09:11.762Z",
+  "updatedAt": "2025-07-14T04:09:42.901Z",
+  "id": "KmviPqXiz7BcoyMc",
+  "name": "My workflow 7",
   "active": false,
   "isArchived": true,
   "nodes": [
@@ -14,13 +14,13 @@
           ]
         }
       },
-      "id": "cb464c0c-9a80-41a1-bcd7-58b0d135caf1",
+      "id": "93de78fa-d578-4155-8171-ab64be9e5c0e",
       "name": "Schedule Trigger",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
-        -960,
-        -80
+        -880,
+        80
       ]
     },
     {
@@ -55,26 +55,26 @@
         },
         "options": {}
       },
-      "id": "c68b439d-4e85-4e25-8d04-fb66748dfe79",
+      "id": "8f0420d1-44f2-42bd-bf8e-62e1da92b6a4",
       "name": "Set Values",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -740,
-        -80
+        -660,
+        80
       ]
     },
     {
       "parameters": {
         "command": "ls n8n.git/.git"
       },
-      "id": "51d682ce-76a0-4041-9eab-c29d0d51587f",
+      "id": "f8a80cfc-c8fc-43d0-a345-65b42695eb09",
       "name": "Check for repo",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        -520,
-        -80
+        -440,
+        80
       ],
       "alwaysOutputData": true,
       "onError": "continueRegularOutput"
@@ -102,91 +102,91 @@
         },
         "options": {}
       },
-      "id": "312d1675-44dd-4619-94cd-494f6093de4b",
+      "id": "25374841-251b-4145-9864-7ae43bec2d8a",
       "name": "If",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -300,
-        -80
+        -220,
+        80
       ]
     },
     {
       "parameters": {
         "command": "=#!/usr/bin/env bash\nset -e\n\nGITHUB_USER=\"{{ $json.username }}\"\nGITHUB_TOKEN=\"{{ $json.token }}\"\nREPO=\"{{ $json.repo }}\"\nEMAIL=\"{{ $json.email }}\"\n\nif [ ! -d \"./${REPO}/.git\" ]; then\n  git init \"${REPO}\"\n  git -C \"${REPO}\" config user.name \"$GITHUB_USER\"\n  git -C \"${REPO}\" config user.email \"$EMAIL\"\n  echo \"# n8n Backups\" > \"${REPO}/README.md\"\n  git -C \"${REPO}\" add README.md\n  git -C \"${REPO}\" commit -m \"Initial commit\"\n  git -C \"${REPO}\" branch -M main\n  git -C \"${REPO}\" remote add origin \"https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/${GITHUB_USER}/${REPO}\"\n  git -C \"${REPO}\" push -u origin main || true\nfi"
       },
-      "id": "6e655581-1372-43c8-b43b-ab9f8572203c",
+      "id": "3dbfe953-d07b-4c8c-ae29-341e573e88ee",
       "name": "Create new repo",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        -80,
-        -160
+        0,
+        0
       ]
     },
     {
       "parameters": {
         "command": "npx n8n export:workflow --backup --output n8n.git/workflows/"
       },
-      "id": "b700504b-652d-4c23-9acc-2e3b26a30752",
+      "id": "9f1492c0-f6c3-47a5-879a-2e49519cc247",
       "name": "Export Workflow",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        140,
-        -80
+        220,
+        80
       ]
     },
     {
       "parameters": {
         "command": "npx n8n export:credentials --backup --output n8n.git/credentials/"
       },
-      "id": "82b6b4ff-36bd-4d95-bb57-a7cdaad98390",
+      "id": "61d7650c-de77-4ec8-b294-9d7053777a32",
       "name": "Export Credentials",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        360,
-        -80
+        440,
+        80
       ]
     },
     {
       "parameters": {
         "command": "=git -C n8n.git add ."
       },
-      "id": "e8c51f0d-2779-4f07-bef8-4f5883d38a46",
+      "id": "0c43586f-da4b-4ee4-9d29-92d059fb5510",
       "name": "git add",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        580,
-        -80
+        660,
+        80
       ]
     },
     {
       "parameters": {
         "command": "=git -C n8n.git commit -m \"Auto backup ({{ new Date().toISOString() }})\""
       },
-      "id": "3fc4e701-54c9-40c2-a241-2d2a4f16c0bf",
+      "id": "45beb560-c496-4cfd-88e5-accd7b7f5095",
       "name": "git commit",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        800,
-        -80
+        880,
+        80
       ]
     },
     {
       "parameters": {
         "command": "=#!/bin/bash\n\nREPO=\"n8n-backup\"\nUSER=\"tropicans\"\nTOKEN=\"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\"\nREMOTE_URL=\"https://${USER}:${TOKEN}@github.com/${USER}/${REPO}.git\"\n\n# Add origin only if not configured\ngit -C $REPO remote get-url origin 2>/dev/null || \\\ngit -C $REPO remote add origin \"$REMOTE_URL\"\n\n# Push to GitHub and set upstream explicitly\ngit -C $REPO push --set-upstream origin main\n"
       },
-      "id": "c1ef831c-d226-45bc-a2c9-bc4a13da5503",
+      "id": "40ae8311-edc6-4d6b-877f-0d7c5ca89ef4",
       "name": "git push",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        1020,
-        -80
+        1100,
+        80
       ]
     }
   ],
@@ -304,7 +304,7 @@
   "staticData": null,
   "meta": null,
   "pinData": {},
-  "versionId": "a94ba382-d988-4dc0-8d11-764a3f438d7f",
+  "versionId": "e7fa5e70-dcd2-4231-b33c-716ca0a24bc1",
   "triggerCount": 0,
   "tags": []
 }
