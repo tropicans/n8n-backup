@@ -40,6 +40,31 @@
     reverse_proxy neo4j:7474
 }
 
+# RAGMARUK Web (Layanan Baru Anda)
+{$RAGMARUK_HOSTNAME} {
+    reverse_proxy ragmaruk-web:80
+}
+
+{$EDBLINK_HOSTNAME} {
+    reverse_proxy edublink-web:80
+}
+
+# --- FIX: Added http:// to disable automatic HTTPS for this local service ---
+http://:{$LOCALGPT_HOSTNAME} {
+    # Requests to /rag-api/... are sent to the RAG API container on its correct port.
+    handle_path /rag-api/* {
+        reverse_proxy localgpt-rag-api:8001
+    }
+
+    # Requests to /backend-api/... are sent to the backend container.
+    handle_path /backend-api/* {
+        reverse_proxy localgpt-backend:5001
+    }
+
+    # All other requests are sent to the frontend container to serve the user interface.
+    reverse_proxy localgpt-frontend:3000
+}
+
 import /etc/caddy/addons/*.conf
 
 # # SearXNG

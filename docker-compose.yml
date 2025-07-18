@@ -14,6 +14,12 @@ volumes:
   langfuse_clickhouse_data:
   langfuse_clickhouse_logs:
   langfuse_minio_data:
+  whisper_cache:
+  localgpt_models:
+  localgpt_data:
+  localgpt_vector_stores:
+  localgpt_db:
+
 
 x-n8n: &service-n8n
   image: n8nio/n8n:latest
@@ -61,13 +67,13 @@ services:
     expose:
       - 3001/tcp
     environment:
-        - PORT=3001
-        - FLOWISE_USERNAME=${FLOWISE_USERNAME}
-        - FLOWISE_PASSWORD=${FLOWISE_PASSWORD}
+      - PORT=3001
+      - FLOWISE_USERNAME=${FLOWISE_USERNAME}
+      - FLOWISE_PASSWORD=${FLOWISE_PASSWORD}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-        - ~/.flowise:/root/.flowise
+      - ~/.flowise:/root/.flowise
     entrypoint: /bin/sh -c "sleep 3; flowise start"
 
   open-webui:
@@ -118,16 +124,16 @@ services:
   neo4j:
     image: neo4j:latest
     volumes:
-        - ./neo4j/logs:/logs
-        - ./neo4j/config:/config
-        - ./neo4j/data:/data
-        - ./neo4j/plugins:/plugins
+      - ./neo4j/logs:/logs
+      - ./neo4j/config:/config
+      - ./neo4j/data:/data
+      - ./neo4j/plugins:/plugins
     expose:
       - 7473/tcp
       - 7474/tcp
       - 7687/tcp
     environment:
-        - NEO4J_AUTH=${NEO4J_AUTH:-"neo4j/your_password"}
+      - NEO4J_AUTH=${NEO4J_AUTH:-"neo4j/your_password"}
     restart: always
 
   caddy:
@@ -137,6 +143,8 @@ services:
     ports:
       - 80:80/tcp
       - 443:443/tcp
+      - 8009:8009/tcp
+      - 8010:8010/tcp
     expose:
       - 2019/tcp
       - 443/tcp
@@ -156,6 +164,9 @@ services:
       - SEARXNG_HOSTNAME=${SEARXNG_HOSTNAME:-":8006"}
       - LANGFUSE_HOSTNAME=${LANGFUSE_HOSTNAME:-":8007"}
       - NEO4J_HOSTNAME=${NEO4J_HOSTNAME:-":8008"}
+      - RAGMARUK_HOSTNAME=${RAGMARUK_HOSTNAME:-":8009"}
+      - LOCALGPT_HOSTNAME=${LOCALGPT_HOSTNAME:-":8010"}
+      - EDBLINK_HOSTNAME=${EDBLINK_HOSTNAME:-":8011"}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL:-internal}
     cap_drop:
       - ALL
@@ -180,7 +191,7 @@ services:
       clickhouse:
         condition: service_healthy
     expose:
-     - 3030/tcp
+      - 3030/tcp
     environment: &langfuse-worker-env
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
       SALT: ${LANGFUSE_SALT}
@@ -282,7 +293,7 @@ services:
     volumes:
       - langfuse_minio_data:/data
     healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
+      test: [ "CMD", "mc", "ready", "local" ]
       interval: 1s
       timeout: 5s
       retries: 5
@@ -292,7 +303,7 @@ services:
     image: postgres:${POSTGRES_VERSION:-latest}
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 3s
       timeout: 3s
       retries: 10
@@ -326,7 +337,7 @@ services:
         max-size: "1m"
         max-file: "1"
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 3s
       timeout: 10s
       retries: 10
@@ -356,11 +367,11 @@ services:
         max-file: "1"
 
   ollama-cpu:
-    profiles: ["cpu"]
+    profiles: [ "cpu" ]
     <<: *service-ollama
 
   ollama-gpu:
-    profiles: ["gpu-nvidia"]
+    profiles: [ "gpu-nvidia" ]
     <<: *service-ollama
     deploy:
       resources:
@@ -368,10 +379,10 @@ services:
           devices:
             - driver: nvidia
               count: 1
-              capabilities: [gpu]
+              capabilities: [ gpu ]
 
   ollama-gpu-amd:
-    profiles: ["gpu-amd"]
+    profiles: [ "gpu-amd" ]
     <<: *service-ollama
     image: ollama/ollama:rocm
     devices:
@@ -379,20 +390,152 @@ services:
       - "/dev/dri"
 
   ollama-pull-llama-cpu:
-    profiles: ["cpu"]
+    profiles: [ "cpu" ]
     <<: *init-ollama
     depends_on:
       - ollama-cpu
 
   ollama-pull-llama-gpu:
-    profiles: ["gpu-nvidia"]
+    profiles: [ "gpu-nvidia" ]
     <<: *init-ollama
     depends_on:
       - ollama-gpu
 
   ollama-pull-llama-gpu-amd:
-    profiles: [gpu-amd]
+    profiles: [ gpu-amd ]
     <<: *init-ollama
     image: ollama/ollama:rocm
     depends_on:
-     - ollama-gpu-amd
+      - ollama-gpu-amd
+
+  insightslm:
+    build:
+      context: ./insights-lm-local-package
+      dockerfile: Dockerfile
+      args:
+        VITE_SUPABASE_URL: ${API_EXTERNAL_URL}
+        VITE_SUPABASE_ANON_KEY: ${ANON_KEY}
+    container_name: insightslm
+    ports:
+      - 3010:80
+    restart: unless-stopped
+
+  coqui-tts:
+    image: ghcr.io/coqui-ai/tts
+    container_name: coqui-tts
+    restart: unless-stopped
+    ports:
+      - 5002
+    entrypoint: [ "python3", "TTS/server/server.py" ]
+    command: [ "--model_name", "tts_models/en/vctk/vits", "--use_cuda", "true" ]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [ "gpu" ]
+
+  whisper-asr:
+    image: onerahmet/openai-whisper-asr-webservice:latest-gpu
+    container_name: whisper-asr
+    restart: unless-stopped
+    ports:
+      - "9002:9000"
+    environment:
+      - ASR_MODEL=${WHISPER_MODEL:-base}
+      - ASR_ENGINE=${WHISPER_ENGINE:-openai_whisper}
+      - ASR_MODEL_PATH=/data/whisper
+    volumes:
+      - whisper_cache:/data/whisper
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
+    profiles: [ "gpu-nvidia" ]
+
+  ragmaruk-web:
+    build:
+      context: ./ragmaruk-insight-flow
+      dockerfile: Dockerfile
+    container_name: ragmaruk-web
+    restart: unless-stopped
+    expose:
+      - 80/tcp
+
+  edublink-web:
+    build:
+      context: ./blink-learn-bright
+      dockerfile: Dockerfile
+    container_name: edublink-web
+    restart: unless-stopped
+    expose:
+      - 80/tcp
+
+  localgpt-frontend:
+    container_name: localgpt-frontend
+    build:
+      context: ./localGPT-localgpt-v2
+      dockerfile: Dockerfile.frontend
+      args:
+        # --- FIX: Use relative paths for browser-side API calls ---
+        NEXT_PUBLIC_RAG_API_URL: /rag-api
+        NEXT_PUBLIC_BACKEND_API_URL: /backend-api
+    restart: unless-stopped
+    expose:
+      - 3000/tcp
+    environment:
+      # --- FIX: Use relative paths for browser-side API calls ---
+      NEXT_PUBLIC_RAG_API_URL: /rag-api
+      NEXT_PUBLIC_BACKEND_API_URL: /backend-api
+      NEXT_PUBLIC_RAG_API_KEY: 3dac6bfe668d2465650c235e26d7083b1726873eaf919745f829e42799fbd4ec
+    depends_on:
+      - localgpt-rag-api
+      - localgpt-backend
+
+  localgpt-rag-api:
+    container_name: localgpt-rag-api
+    build:
+      context: ./localGPT-localgpt-v2
+      dockerfile: Dockerfile.rag-api
+      args:
+        HTTP_PROXY: ${HTTP_PROXY}
+        HTTPS_PROXY: ${HTTPS_PROXY}
+    restart: unless-stopped
+    expose:
+      - 8001/tcp
+    volumes:
+      - localgpt_models:/app/models
+      - localgpt_data:/app/data
+      - localgpt_vector_stores:/app/vector_stores
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - RAG_API_KEY=3dac6bfe668d2465650c235e26d7083b1726873eaf919745f829e42799fbd4ec
+    command: [ "sh", "-c", "sleep 15; python -m rag_system.api_server --host 0.0.0.0 --port 8001" ]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
+
+  localgpt-backend:
+    container_name: localgpt-backend
+    build:
+      context: ./localGPT-localgpt-v2
+      dockerfile: Dockerfile.backend
+      args:
+        HTTP_PROXY: ${HTTP_PROXY}
+        HTTPS_PROXY: ${HTTPS_PROXY}
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    expose:
+      - 5001/tcp
+    volumes:
+      - localgpt_db:/app/chat_data.db
+    environment:
+      - PORT=5001
+    command: ["python", "server.py"]
