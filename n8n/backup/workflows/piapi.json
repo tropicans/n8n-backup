@@ -1,0 +1,163 @@
+{
+  "createdAt": "2025-06-20T01:32:36.099Z",
+  "updatedAt": "2025-07-02T03:08:04.773Z",
+  "id": "1cwIlYkSCImQAt1C",
+  "name": "piapi",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -40
+      ],
+      "id": "c52a54b4-3d82-4ec7-b8e4-6051f943e474",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.piapi.ai/api/v1/task",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "51ed513214fdf5d10b8a0616b6931716f5700a914ca95282fad7b2fa1542d2f0"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n    \"model\": \"Qubico/flux1-schnell\",\n    \"task_type\": \"txt2img\",\n    \"input\": {\n        \"prompt\": \"A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing on tiptoe, arms outstretched as if about to grasp something just out of reach, conveying excitement and anticipation]. Set in [a vibrant, dreamlike landscape with layers of fluffy pastel clouds in the background, a sunbeam illuminating a path in the midground, and lush green grass in the foreground]. Style: doodle cartoon with textured brush outlines. Shading & Gradients: soft shading and gentle gradients using muted neons and cozy pastels. Layers: foreground – [lush green grass with glowing, pastel-colored wildflowers], midground – [a sunlit path leading towards a bright, almost ethereal light source], background – [fluffy, pastel-colored clouds forming a whimsical sky]. Stick-figure posture: [excited anticipation, reaching towards the light]. Facial expression: [eager anticipation, with a wider, yet still gentle, friendly smile]. Accessory: [a small backpack overflowing with brightly colored, miniature glowing stars]. Motion cue: [slightly blurred feet to suggest movement and anticipation]. Environment: [a hopeful and optimistic dreamscape]. Symbolic object: [the bright light at the end of the path, representing a significant opportunity or achievement]. Color palette: [muted neons like peach, lavender, and mint green, combined with soft pastels like creamy yellow and baby blue].\",\n        \"width\": 1024, \n        \"height\": 576\n    } \n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        -40
+      ],
+      "id": "10a1c5f4-cf4f-41b1-85ad-1f9d2d753afe",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.piapi.ai/api/v1/task/{{ $json.data.task_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "51ed513214fdf5d10b8a0616b6931716f5700a914ca95282fad7b2fa1542d2f0"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        -40
+      ],
+      "id": "b3fab4ef-52dd-4554-b5fa-57c832747d31",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4dcf80b5-461e-434f-8892-644e263c3f48",
+              "name": "imageUrl",
+              "value": "={{ $json.data.output.image_url }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        660,
+        -40
+      ],
+      "id": "007b6060-9a2b-4677-aaeb-db42f98fb65f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.imageUrl }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        -40
+      ],
+      "id": "4910c50a-5ef9-4e70-9996-ee1d4f9f7225",
+      "name": "HTTP Request"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "e41eacdb-9c19-450b-bfdf-024769ee1dbe",
+  "triggerCount": 0,
+  "tags": []
+}

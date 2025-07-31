@@ -1,0 +1,311 @@
+{
+  "createdAt": "2025-06-08T06:49:46.705Z",
+  "updatedAt": "2025-07-02T03:07:30.244Z",
+  "id": "mhr8WDItF3bUvYru",
+  "name": "GeneratePIC",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.together.xyz/v1/images/generations",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "black-forest-labs/FLUX.1-schnell"
+            },
+            {
+              "name": "prompt",
+              "value": "={{ $json.TTMPrompt }}"
+            },
+            {
+              "name": "width",
+              "value": "={{ 960 }}"
+            },
+            {
+              "name": "height",
+              "value": "={{ 544 }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        -255
+      ],
+      "id": "9ece06f1-0cc8-4553-8d74-933f8c8e5f4c",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "TQyyoJmsyxTd5kgs",
+          "name": "Together AI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        660,
+        -180
+      ],
+      "id": "6fd78dd2-201b-46b5-8d13-03d5fb3b1928",
+      "name": "Wait",
+      "webhookId": "74276acc-e402-42a8-9cd5-dffc3cb51c58"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{(() => {\n  const loopData = $('Loop Over Items2').item.json;\n\n  const no = parseInt(loopData.No ?? \"0\", 10);\n  const rawTitle = loopData.Judul || loopData.ScriptSegment || \"no_title\";\n\n  const cleanTitle = rawTitle\n    .slice(0, 50)\n    .replace(/[^a-zA-Z0-9]+/g, \"_\")\n    .replace(/^_+|_+$/g, \"\")\n    .trim();\n\n  const folderName = cleanTitle;\n\n  let fullPath = `/data/shared/content/${folderName}/gambar/${no}.jpg`;\n\n  // Filter karakter non-ascii/non-legal di nama file (untuk kasus aneh)\n  fullPath = fullPath.replace(/[^\\x20-\\x7E]/g, \"\");\n\n  return fullPath;\n})()}}",
+        "options": {
+          "append": true
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        440,
+        -255
+      ],
+      "id": "b71a4dd8-56a8-4fe4-8d00-3cb79244108c",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -660,
+        -280
+      ],
+      "id": "8e046066-50c5-44dc-baa2-5fae268638b3",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "batchSize": "=1",
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -220,
+        -180
+      ],
+      "id": "8c5ac798-55e9-4f7b-97d3-7e3d68a91e27",
+      "name": "Loop Over Items2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8560e76c-fdfa-4cdc-8b7f-3b0e50b195c8",
+              "name": "foldername",
+              "value": "={{ (() => {\n  const judul = $json.Judul || \"untitled\";\n\n  return judul\n    .slice(0, 50)\n    .replace(/[<>:\"/\\\\|?*\\x00-\\x1F]/g, \"\")     // hapus karakter ilegal\n    .replace(/[^a-zA-Z0-9]+/g, \"_\")            // semua non-alfanumerik → 1 underscore\n    .replace(/^_+|_+$/g, \"\")                   // hapus underscore di awal/akhir\n    .trim();\n})() }}",
+              "type": "string"
+            },
+            {
+              "id": "84111f6a-f156-4d81-ade3-27626c9e0b8b",
+              "name": "No",
+              "value": "={{ $json.No }}",
+              "type": "string"
+            },
+            {
+              "id": "29746668-a14f-473b-9fbb-2f38cec032a3",
+              "name": "TTMPrompt",
+              "value": "={{ $json.TTMPrompt }}",
+              "type": "string"
+            },
+            {
+              "id": "a137e157-5960-48a7-8b43-bf5ac0c16eb2",
+              "name": "ScriptSegment",
+              "value": "={{ $json.ScriptSegment }}",
+              "type": "string"
+            },
+            {
+              "id": "1010c411-a29c-4ebd-b00d-26baa4fbeffd",
+              "name": "Status",
+              "value": "={{ $json.Status }}",
+              "type": "string"
+            },
+            {
+              "id": "f90b7a84-1997-4d70-8e93-3a81a32f5d34",
+              "name": "spreadsheetId",
+              "value": "={{ $json.spreadsheetId }}",
+              "type": "string"
+            },
+            {
+              "id": "5108caa5-dafc-4220-974e-0b729604aeb7",
+              "name": "sheetId",
+              "value": "={{ $json.sheetId }}",
+              "type": "number"
+            },
+            {
+              "id": "65369d8b-572d-489a-8ecc-3be921edc95b",
+              "name": "Judul",
+              "value": "={{ $json.Judul }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -440,
+        -280
+      ],
+      "id": "62b05de0-3734-411b-b7f9-894e4000049f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "command": "={{ \n  `mkdir -p \"/data/shared/content/${$json.foldername}/gambar\"`\n}}"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -220,
+        -380
+      ],
+      "id": "8b4a48d0-e44b-4e45-82f7-aa2a1b9b9e1b",
+      "name": "Execute Command"
+    },
+    {
+      "parameters": {
+        "url": "={{$json[\"body\"][\"data\"][0][\"url\"]}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        -255
+      ],
+      "id": "0858cf5d-bc16-41a6-9af5-b50db6d88be1",
+      "name": "HTTP Request1"
+    }
+  ],
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "3fe24904-86c3-47b4-b72c-96869e18903b",
+  "triggerCount": 0,
+  "tags": []
+}

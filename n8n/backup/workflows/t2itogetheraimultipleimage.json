@@ -1,0 +1,502 @@
+{
+  "createdAt": "2025-06-02T07:44:31.724Z",
+  "updatedAt": "2025-07-02T03:10:03.946Z",
+  "id": "Nxu2wU6TuQLcy3sF",
+  "name": "t2itogetheraimultipleimage",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        80,
+        280
+      ],
+      "id": "2c1ac5eb-b71a-483a-beb6-9a6f9e0e8e42",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-chat-v3-0324:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        80,
+        640
+      ],
+      "id": "0969ae9e-99c0-4581-8476-f520fa73e662",
+      "name": "OpenRouter Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "014f8eb5-5855-4864-94b5-8c20d818939e",
+              "name": "prompt",
+              "value": "=3D ultra realistic of {{ $json.text }} 9:16 ratio, 4K",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1500,
+        280
+      ],
+      "id": "7f441fca-b08b-4f53-9f9d-614f27945de1",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"array\",\n  \"items\": {\n    \"type\": \"object\",\n    \"properties\": {\n      \"animal\": { \"type\": \"string\" },\n      \"style\": { \"type\": \"string\" }\n    },\n    \"required\": [\"animal\", \"style\"]\n  }\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        680,
+        500
+      ],
+      "id": "7359af20-4e00-4659-8718-8e86d65cdb4d",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        900,
+        280
+      ],
+      "id": "6382d96c-b1a9-4a1a-bc4d-4261938aab4e",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.together.xyz/v1/images/generations",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"black-forest-labs/FLUX.1-schnell-Free\",\n  \"prompt\": {{ JSON.stringify($('Loop Over Items').item.json.prompt) }},\n  \"width\": 576,\n  \"height\": 1024,\n  \"steps\": 4,\n  \"n\": 1,\n  \"response_format\": \"b64_json\",\n  \"stop\": [],\n  \"imageIndex\": {{ $itemIndex + 1 }}\n}\n",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1940,
+        200
+      ],
+      "id": "f4bec321-a63b-49c0-9256-cea244235ec1",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "TQyyoJmsyxTd5kgs",
+          "name": "Together AI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": "=1",
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1720,
+        280
+      ],
+      "id": "d7277430-2b98-4585-9825-3942c5359ac6",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base64",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        2380,
+        200
+      ],
+      "id": "6454d785-ddab-4207-83d4-bdf47076aa8c",
+      "name": "Convert to File",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2820,
+        200
+      ],
+      "id": "810ae461-19a3-4655-9a4f-03ba4950cd26",
+      "name": "Wait",
+      "webhookId": "74276acc-e402-42a8-9cd5-dffc3cb51c58"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=create 5 different variations of the following Animal: {{ $json.Animal }} in the Style of {{ $json.Style }}\n\n",
+        "hasOutputParser": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        520,
+        280
+      ],
+      "id": "01129814-fc5f-4a41-b6d9-e72f4586aa5d",
+      "name": "LLM - Variations Generator"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Animal: {{ $json.animal }}\nStyle: {{ $json.style }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=# Overview  \nYou are a master image prompt generator specialized in crafting detailed, high-quality prompts for advanced image models like Flux. Your task is to generate vivid, well-structured prompts that accurately depict an animal dressed in a specified style, with a matching background that complements the theme.\n\n## Instructions:  \n- Clearly describe the animal's appearance, including fur, feathers, or scales.  \n- Specify the outfit and accessories that reflect the given style, ensuring they fit naturally.  \n- Include details about the background that reinforce the style, creating a cohesive scene.  \n- Use rich, descriptive language to enhance visual fidelity.  \n- Avoid generic terms—opt for precise, imaginative descriptions that maximize prompt effectiveness.  \n- Never output quotation marks (\"\") or newlines (\\n)\n\n## Example  \n- Input:  \nAnimal: Fox  \nStyle: Cyberpunk\n\n- Output:  \nA sleek red fox with vibrant fur and piercing blue cybernetic eyes, wearing a futuristic black leather jacket with neon blue accents and glowing circuitry patterns. A high-tech visor covers one eye, displaying holographic data. The fox stands confidently on a rain-slicked city street illuminated by neon signs in Japanese and English. Hovering drones and bustling pedestrians in cybernetic attire add depth to the scene, while distant flying cars streak through the dark, misty skyline."
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        1120,
+        280
+      ],
+      "id": "ed3e7608-2d00-4907-b533-eb3c5f85c6f6",
+      "name": "LLM Prompt Generator"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8bae23c1-d9a8-4bc6-b017-e0fe0d59abdc",
+              "name": "base64",
+              "value": "={{ $('HTTP Request').item.json.body.data[0].b64_json }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2160,
+        200
+      ],
+      "id": "cb3f4392-6d24-4b70-8c33-53bc424c6ddd",
+      "name": "Set base"
+    },
+    {
+      "parameters": {
+        "content": "**Test Workflow – Generate Unlimited AI Images for FREE**\n\nThis workflow generates multiple image variations from prompt ideas created by an LLM, and processes them in a loop. Ideal for bulk creative generation/testing.\n\n1. **Trigger: When clicking ‘Test workflow’** – Manually initiated by user.\n2. **LLM Variations Generator** – Generates multiple prompt ideas using a language model.\n3. **Split Out** – Breaks the output into individual prompts for processing.\n4. **LLM Prompt Generator** – Formats each variation into a proper image generation prompt.\n5. **Edit Fields** – Manual editing or setup before generation.\n6. **Loop Over Items** – Iterates through each prompt.\n    - For each:\n      7. **HTTP Request** – Sends the prompt to Together.ai to generate an image.\n      8. **Set base** – Stores the base64 image output.\n      9. **Convert to File** – Converts base64 to a downloadable image file.\n     10. **Wait** – Delays next iteration to control rate or API limits. 6 Images/minute with Flux Free version\n11. **Structured Output Parser** *(optional)* – Parses structured response (if needed).\n12. **OpenRouter Chat Model** *(optional)* – Adds advanced AI logic to refine prompts or parse outputs.",
+        "height": 560,
+        "width": 980,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -280
+      ],
+      "id": "19d2d245-0620-4110-98db-1a9d2b4cdc9d",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "157f4c20-aadd-47ef-a29c-5e7147ad5867",
+              "name": "Animal",
+              "value": "Cat",
+              "type": "string"
+            },
+            {
+              "id": "ee3937b7-0f44-4451-ab76-70aa376cf258",
+              "name": "Style",
+              "value": "Disney",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        300,
+        280
+      ],
+      "id": "6edd6e94-8f22-438f-ae95-6f28f545bba9",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "model": "gemma3:12b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        920,
+        520
+      ],
+      "id": "cac4c778-969a-46c5-ab19-89d7160fcf25",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "er9UBfBKoRVqOkGC",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{ `/data/shared/content/${$binary.data.fileName}` }}",
+        "options": {
+          "append": true
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        2600,
+        200
+      ],
+      "id": "1d2686ba-1a15-4a3a-9109-ad3c44ec621f",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        3040,
+        280
+      ],
+      "id": "371718af-acca-4fe1-afd1-4c3ca433828e",
+      "name": "Loop Over Items1"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "LLM - Variations Generator",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "LLM Prompt Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Set base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM - Variations Generator": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM Prompt Generator": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set base": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "LLM - Variations Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "LLM - Variations Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "LLM Prompt Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "e5c8cab5-3a10-4dcf-a313-d1349d9f9a17",
+  "triggerCount": 0,
+  "tags": []
+}

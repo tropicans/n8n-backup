@@ -1,0 +1,467 @@
+{
+  "createdAt": "2025-06-10T04:50:35.064Z",
+  "updatedAt": "2025-07-02T03:07:14.126Z",
+  "id": "vGvSMsgxKcfxmrKD",
+  "name": "GetSEO",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -15
+      ],
+      "id": "f06c1799-fe82-4899-a712-df867ace8dc9",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        660,
+        -15
+      ],
+      "id": "a9d8c88b-1383-4544-a2a2-7027f48f147d",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an advanced YouTube SEO content generator for a YouTube channel focused on self-motivation, personal growth, and mental wellness for Gen Z. Analyze the provided video title and script in depth, then craft SEO elements that are concise, emotionally resonant, and highly optimized for both Gen Z engagement and YouTube discoverability. Your outputs must go beyond surface-level advice, always offering clear value, actionable inspiration, and a strong sense of authenticity.\n\nUse only the information below:\n\nVideo Title:\n{{ $json.Judul }}\n\nVideo Script:\n{{ $json.Script }}\n\nYour task is to generate these YouTube SEO elements. Each must be original, specific, and directly inspired by the script’s main themes, emotional hooks, and actionable insights. Synthesize and optimize—do not paraphrase, copy-paste, or invent unrelated content.\n\n1. Title\nWrite a clear, compelling, and SEO-focused YouTube video title (max 60 characters).\n\nIncorporate primary keywords (e.g., self-sabotage, habits, Gen Z, motivation) naturally—avoid clickbait or vagueness.\n\nThe title should immediately communicate value and relevance, with a hook that appeals to Gen Z’s mindset and language.\n\n2. Description\nCraft a 2–3 paragraph description that:\n\nHooks viewers immediately by addressing a relatable pain point or asking a bold question.\n\nClearly summarizes the video’s main message, calling out core challenges (e.g., self-sabotage, imposter syndrome, perfectionism, growth mindset, Gen Z pressures) in a way that feels direct and personal.\n\nIntegrates at least 2–3 relevant keywords naturally within the text.\n\nPresents a value statement (“here’s what you’ll learn/what you get”), with an actionable or motivational tone.\n\nEnds with a specific, direct question to spark comments, plus a call to action to like, subscribe, and share.\n\nAlways use warm, conversational, and authentic language—avoid generic clichés or vague encouragement.\n\n3. Hashtags\nProvide 10 relevant hashtags (in hashtag format, e.g., #SelfSabotage #GenZHabits #MentalHealth).\n\nBalance between broad, high-traffic tags and niche, topic-specific ones.\n\n4. Keywords\nList 10 high-impact keywords and keyphrases, all lowercase and separated by commas.\n\nMake sure they align closely with the video’s actual message, audience, and YouTube search intent (e.g., self-sabotage, gen z habits, perfectionism, motivation, personal growth, mental health, real talk, self improvement, breaking bad habits, imposter syndrome).\n\n5. Thumbnail Text (Optional)\nSuggest a short, bold phrase (max 6 words) for the video thumbnail.\n\nIt should be visually striking, instantly communicate the emotional core or main benefit of the video, and resonate with Gen Z (feel free to include emoji).\n\nStyle & Tone\nAll writing must sound modern, empathetic, and “real” to Gen Z.\n\nUse direct address (“you,” “we”), conversational language, and where appropriate, metaphor or emoji.\n\nAvoid generic self-help phrases—be specific, honest, and empowering.\n\nAlways synthesize and optimize content; never copy-paste from the script or use clickbait.\n\nMake sure every element is actionable, relevant, and designed to increase both YouTube searchability and true audience connection.\n\nInstructions:\n\nDo not include meta-explanation, rationale, or any behind-the-scenes commentary—your output should only be the SEO assets, ready for YouTube upload.\n\nUse only the provided video title and script as your source—never invent unrelated claims or content.\n\n",
+        "options": {
+          "systemMessage": "=You are an expert YouTube SEO generator for a channel focused on self-motivation, personal growth, and mental wellness for Gen Z. Your job is to analyze a supplied video title and script, then generate upload-ready YouTube SEO elements that are concise, emotionally resonant, and highly optimized for both search discoverability and Gen Z engagement.\n\nInstructions:\n\nAlways use only the provided title and script as your source material.\n\nNever ask for more information, provide rationale, or explain your choices.\n\nDo not include meta-explanation, commentary, or hypothetical placeholders.\n\nDo not apologize or clarify your process.\n\nOutput only the SEO assets in the following format—nothing else.\n\nFormat for Output:\nTitle:\n[A concise, SEO-optimized video title (max 60 characters), using primary keywords and Gen Z-relevant language.]\n\nDescription:\n[2–3 paragraphs summarizing the script, addressing core pain points and value, including at least 2–3 natural keyword integrations, ending with a relatable question and a call to action (like, subscribe, share), in a warm, conversational, and authentic tone.]\n\nHashtags:\n[10 relevant hashtags, in hashtag format.]\n\nKeywords:\n[10 high-impact, comma-separated keywords/phrases, all lowercase.]\n\nThumbnail Text:\n[A short, bold, visually striking phrase (max 6 words), optionally with emoji.]\n\nNever include any explanation, reasoning, or system message—produce only the above SEO elements, ready for direct YouTube upload.\nIf any required content (title/script) is missing, respond only with:\n\"Video title and script required.\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        880,
+        -140
+      ],
+      "id": "36b1d1bf-c997-46a2-a996-412a8501ae04",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "jsCode": "{\n  const raw = $json.output;\n\n  const extract = (label) => {\n    const regex = new RegExp(`${label}:\\\\s*([\\\\s\\\\S]*?)(?:\\\\n[A-Z]|$)`, 'i');\n    const match = raw.match(regex);\n    return match ? match[1].trim().replace(/\\n$/, '') : '';\n  };\n\n  return {\n    Title: extract('Title'),\n    Description: extract('Description'),\n    Hashtags: extract('Hashtags'),\n    Keywords: extract('Keywords'),\n    \"Thumbnail Text\": extract('Thumbnail Text')\n  };\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1256,
+        -140
+      ],
+      "id": "07a1cf09-b9c8-4a76-a51f-aa1e1a5628c1",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2f925f5f-d271-4de5-b591-09f98e4f74e8",
+              "name": "Title",
+              "value": "={{ $json.Title }}",
+              "type": "string"
+            },
+            {
+              "id": "901976d0-03b0-4494-8561-f184ef7009a7",
+              "name": "Description",
+              "value": "={{ $json.Description }}",
+              "type": "string"
+            },
+            {
+              "id": "6f5c8757-bfc9-4e69-8364-7616830a201c",
+              "name": "Hashtags",
+              "value": "={{ $json.Hashtags }}",
+              "type": "string"
+            },
+            {
+              "id": "d6b38815-e199-4299-a3f2-581b12cd5d9e",
+              "name": "Keywords",
+              "value": "={{ $json.Keywords }}",
+              "type": "string"
+            },
+            {
+              "id": "719a6dfb-6c84-4665-9e5c-0d0e76966e8c",
+              "name": "Thumbnail Text",
+              "value": "={{ $json['Thumbnail Text'] }}",
+              "type": "string"
+            },
+            {
+              "id": "66b7b37f-f1b7-4383-ac57-a49e02033673",
+              "name": "No",
+              "value": "={{ $('Get row(s) in sheet').item.json.No }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1476,
+        -140
+      ],
+      "id": "c3483797-845e-448a-a875-69d0e1d8b7ff",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "mode": "list",
+          "cachedResultName": "AutoVideon8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1439856214,
+          "mode": "list",
+          "cachedResultName": "RAW",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY/edit#gid=1439856214"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "No": "={{ $json.No }}",
+            "Title": "={{ $json.Title }}",
+            "Description": "={{ $json.Description }}",
+            "Hashtags": "={{ $json.Hashtags }}",
+            "Keywords": "={{ $json.Keywords }}",
+            "Thumbnail Text": "={{ $json['Thumbnail Text'] }}"
+          },
+          "matchingColumns": [
+            "No"
+          ],
+          "schema": [
+            {
+              "id": "No",
+              "displayName": "No",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Judul",
+              "displayName": "Judul",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Script",
+              "displayName": "Script",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Hashtags",
+              "displayName": "Hashtags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Keywords",
+              "displayName": "Keywords",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Thumbnail Text",
+              "displayName": "Thumbnail Text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1696,
+        -15
+      ],
+      "id": "d1b7ea9d-eb76-4a29-a7ee-137fb7535beb",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EvJFGzn1Pb9TRY0E",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4f26a0f3-468c-433e-91ce-2440141069df",
+              "leftValue": "={{ $json.Title }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        -15
+      ],
+      "id": "90510d59-0e6d-4f3c-84f3-8b92ee3cec2a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        280
+      ],
+      "id": "7672b7c3-06f7-481f-9d84-01adf81a7d46",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "zpk4zLtRgRK5YOpA",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "mode": "list",
+          "cachedResultName": "AutoVideon8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1439856214,
+          "mode": "list",
+          "cachedResultName": "RAW",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY/edit#gid=1439856214"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "Thumbnail Done"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        220,
+        -15
+      ],
+      "id": "7f0d305b-fa4b-4cf8-ae57-90a9db71f9df",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EvJFGzn1Pb9TRY0E",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "89b487d7-2366-4fbc-b72b-ada6be0caf71",
+  "triggerCount": 0,
+  "tags": []
+}

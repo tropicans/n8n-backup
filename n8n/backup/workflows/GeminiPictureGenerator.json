@@ -1,0 +1,977 @@
+{
+  "createdAt": "2025-06-19T03:55:52.869Z",
+  "updatedAt": "2025-07-02T03:08:11.625Z",
+  "id": "bOdhBDTomGKww1Xe",
+  "name": "GeminiPictureGenerator",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -340
+      ],
+      "id": "42fa497e-9bbe-42a9-a96f-b42a0e682c66",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  contents: [\n    {\n      role: \"user\",\n      parts: [\n        {\n          text: $json.TTMPrompt // atau field lain yang dinamis\n        }\n      ]\n    }\n  ],\n  generationConfig: {\n    responseModalities: [\"Text\", \"Image\"]\n  }\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        -315
+      ],
+      "id": "0302680d-aad3-437d-a4fa-b5c589b38839",
+      "name": "HTTP Request",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "zpk4zLtRgRK5YOpA",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "candidates[0].content.parts[1].inlineData.data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        -315
+      ],
+      "id": "14522e91-5797-4910-9ece-52b45beff7e0",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8560e76c-fdfa-4cdc-8b7f-3b0e50b195c8",
+              "name": "foldername",
+              "value": "={{ (() => {\n  const judul = $json.Judul || \"untitled\";\n\n  return judul\n    .slice(0, 50)\n    .replace(/[<>:\"/\\\\|?*\\x00-\\x1F]/g, \"\")     // hapus karakter ilegal\n    .replace(/[^a-zA-Z0-9]+/g, \"_\")            // semua non-alfanumerik → 1 underscore\n    .replace(/^_+|_+$/g, \"\")                   // hapus underscore di awal/akhir\n    .trim();\n})() }}",
+              "type": "string"
+            },
+            {
+              "id": "84111f6a-f156-4d81-ade3-27626c9e0b8b",
+              "name": "No",
+              "value": "={{ $json.No }}",
+              "type": "string"
+            },
+            {
+              "id": "29746668-a14f-473b-9fbb-2f38cec032a3",
+              "name": "TTMPrompt",
+              "value": "=Generate a high definition, {{ $json.TTMPrompt }} Make sure the image is suitable for a 1080p display, 16:9 ratio image.",
+              "type": "string"
+            },
+            {
+              "id": "a137e157-5960-48a7-8b43-bf5ac0c16eb2",
+              "name": "ScriptSegment",
+              "value": "={{ $json.ScriptSegment }}",
+              "type": "string"
+            },
+            {
+              "id": "1010c411-a29c-4ebd-b00d-26baa4fbeffd",
+              "name": "Status",
+              "value": "={{ $json.Status }}",
+              "type": "string"
+            },
+            {
+              "id": "f90b7a84-1997-4d70-8e93-3a81a32f5d34",
+              "name": "spreadsheetId",
+              "value": "={{ $json.spreadsheetId }}",
+              "type": "string"
+            },
+            {
+              "id": "5108caa5-dafc-4220-974e-0b729604aeb7",
+              "name": "sheetId",
+              "value": "={{ $json.sheetId }}",
+              "type": "number"
+            },
+            {
+              "id": "65369d8b-572d-489a-8ecc-3be921edc95b",
+              "name": "Judul",
+              "value": "={{ $json.Judul }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        -340
+      ],
+      "id": "a3ce16a3-50d5-4017-85aa-108b4d978c76",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "command": "={{ \n  `mkdir -p \"/data/shared/content/${$json.foldername}/gambar\"`\n}}"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        440,
+        -440
+      ],
+      "id": "8ceeda52-22b8-49ae-9b31-54983348ddeb",
+      "name": "Execute Command"
+    },
+    {
+      "parameters": {
+        "batchSize": "=1",
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        440,
+        -240
+      ],
+      "id": "d3853d12-dd96-4c85-8c4b-6e6bcdb5d77f",
+      "name": "Loop Over Items2"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{(() => {\n  const loopData = $('Loop Over Items2').item.json;\n\n  const no = parseInt(loopData.No ?? \"0\", 10);\n  const rawTitle = loopData.Judul || loopData.ScriptSegment || \"no_title\";\n\n  const cleanTitle = rawTitle\n    .slice(0, 50)\n    .replace(/[^a-zA-Z0-9]+/g, \"_\")\n    .replace(/^_+|_+$/g, \"\")\n    .trim();\n\n  const folderName = cleanTitle;\n\n  let fullPath = `/data/shared/content/${folderName}/gambar/${no}.jpg`;\n\n  // Filter karakter non-ascii/non-legal di nama file (untuk kasus aneh)\n  fullPath = fullPath.replace(/[^\\x20-\\x7E]/g, \"\");\n\n  return fullPath;\n})()}}",
+        "options": {
+          "append": true
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        -315
+      ],
+      "id": "aef623db-49b7-4289-95c3-c23cb38b5e0b",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1320,
+        -240
+      ],
+      "id": "40174159-667c-4133-b854-85a9c0dd6932",
+      "name": "Wait",
+      "webhookId": "2def5bf9-7e52-4b46-8eb8-22b26d7d34cd"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "When clicking ‘Execute workflow’": [
+      {
+        "json": {
+          "No": "1",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing on tiptoe, arms outstretched as if about to grasp something just out of reach, conveying excitement and anticipation]. Set in [a vibrant, dreamlike landscape with layers of fluffy pastel clouds in the background, a sunbeam illuminating a path in the midground, and lush green grass in the foreground].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients using muted neons and cozy pastels.\nLayers: foreground – [lush green grass with glowing, pastel-colored wildflowers], midground – [a sunlit path leading towards a bright, almost ethereal light source], background – [fluffy, pastel-colored clouds forming a whimsical sky].\nStick-figure posture: [excited anticipation, reaching towards the light].\nFacial expression: [eager anticipation, with a wider, yet still gentle, friendly smile].\nAccessory: [a small backpack overflowing with brightly colored, miniature glowing stars].\nMotion cue: [slightly blurred feet to suggest movement and anticipation].\nEnvironment: [a hopeful and optimistic dreamscape].\nSymbolic object: [the bright light at the end of the path, representing a significant opportunity or achievement].\nColor palette: [muted neons like peach, lavender, and mint green, combined with soft pastels like creamy yellow and baby blue].\n",
+          "ScriptSegment": "You're on the verge of something BIG, aren't you?",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "2",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile, standing with arms slightly raised, as if feeling a light breeze, posture conveying a sense of calm excitement] Set in [a vibrant, pastel-colored field of wildflowers at sunset, with a glowing, nebula-like sky layered above].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients, emphasizing the warmth of the sunset.\nLayers: foreground – [the stick figure, surrounded by a few gently swaying wildflowers], midground – [a field of wildflowers extending to the horizon], background – [a soft, nebula-like sunset sky with muted neon pinks and oranges].\nStick-figure posture: [calm excitement, feeling the energy of possibility].\nFacial expression: [a gentle, hopeful smile, dot eyes sparkling slightly].\nAccessory: [a small, glowing seed sprouting from the stick figure's hand, symbolizing potential].\nMotion cue: [a gentle breeze causes the wildflowers and the stick figure's hair to sway slightly].\nEnvironment: [a peaceful and hopeful field at sunset].\nSymbolic object: [the glowing seed represents untapped potential, the sunset symbolizes the end of one phase and the beginning of another].\nColor palette: [cozy pastels of pinks, lavenders, and oranges, with a touch of muted neon pink in the sky].\n",
+          "ScriptSegment": "You feel it - that hum of potential,",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "3",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile;  leaning forward with one leg slightly bent,  a posture suggesting eager anticipation and readiness—posture conveys poised energy]. Set in [a vibrant, upward-sloping landscape with layers suggesting progression].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients, using a slightly airbrushed effect.\nLayers: foreground – [the stick figure, their foot almost touching a glowing, neon-pink upward-pointing arrow], midground – [a gently sloping path paved with pastel-colored stepping stones leading towards a peak bathed in soft, peachy light], background – [a hazy, muted-teal sky with a few fluffy, cotton-candy clouds].\nStick-figure posture: [eager anticipation and poised energy; leaning forward, ready to spring into action].\nFacial expression: [determined but friendly smile; dot eyes conveying focus and excitement].\nAccessory: [a small, glowing backpack with a neon-yellow zipper, representing the potential and resources they carry].\nMotion cue: [a subtle motion blur effect on the stick figure’s lower leg, suggesting the beginning of movement].\nEnvironment: [upward-sloping landscape symbolizing progress and growth].\nSymbolic object: [a glowing neon-pink upward-pointing arrow, representing the \"level up\" and direction of their restless energy].\nColor palette: [a blend of muted neons (pink, yellow) and cozy pastels (peach, teal), creating an optimistic and energetic mood].\n",
+          "ScriptSegment": "the restless energy pushing you toward a level up.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "4",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing slightly hunched, looking down at a heavy, grey backpack overflowing with small, brightly colored, but slightly blurry, objects; posture conveys a sense of being weighed down, but still hopeful]. Set in [a sun-dappled forest clearing with soft, glowing mushrooms in the midground and a distant, hazy mountain range in the background].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients; use a slightly desaturated color palette to emphasize the feeling of being weighed down.\nLayers: foreground – [the stick figure and the overflowing backpack], midground – [softly glowing, pastel-colored mushrooms], background – [a hazy, purple-tinged mountain range].\nStick-figure posture: [slightly hunched, shoulders slumped, but head held slightly up; conveying a feeling of being burdened but not defeated].\nFacial expression: [gentle, friendly smile, but eyes slightly downcast and thoughtful; showing introspection, not sadness].\nAccessory: [a heavy, grey backpack overflowing with small, brightly colored, but slightly blurry objects representing responsibilities and goals].\nMotion cue: [none].\nEnvironment: [a peaceful but slightly challenging forest clearing; the sense of gentle sunlight offers hope amidst the burden].\nSymbolic object: [the overflowing backpack representing overwhelming responsibilities or self-doubt].\nColor palette: [muted neons—blues and purples for the background, with soft pastel oranges and yellows for the mushrooms, and muted greys for the backpack;  cozy pastels for the foreground and mid-ground, creating a balance between hope and difficulty].\n",
+          "ScriptSegment": "But something's holding you back,",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "5",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; slightly hunched posture, conveying a sense of mild frustration but not defeat; carrying a small, heavy backpack overflowing with seemingly insignificant items] Set in [a sun-dappled forest clearing, overgrown with vibrant but slightly wilting wildflowers; a sense of both beauty and quiet struggle].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients using muted neons (teal, peach, lavender).\nLayers: foreground – [the stick figure struggling slightly with the weight of the backpack], midground – [the overgrown wildflowers, some drooping], background – [distant, hazy sunlit trees].\nStick-figure posture: [slightly hunched, shoulders slumped, but maintaining the gentle smile, conveying a feeling of perseverance through a minor obstacle].\nFacial expression: [gentle, friendly smile, dot eyes slightly downturned—expressing mild frustration but not sadness].\nAccessory: [an overly full, brightly colored backpack, representative of unseen burdens and responsibilities].\nMotion cue: [the stick figure taking a small, determined step forward, despite the weight of the backpack].\nEnvironment: [a beautiful but slightly overgrown forest clearing; represents the hidden obstacles in the path to success].\nSymbolic object: [the overly full backpack—a metaphor for \"hidden friction,\" representing unseen challenges weighing down personal growth].\nColor palette: [muted neons (teal, peach, lavender) and soft greens and browns to contrast and emphasize both beauty and challenge].\n",
+          "ScriptSegment": "a hidden friction,",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "6",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing slightly hunched, shoulders slumped, looking down at a small, tangled ball of yarn in their hands—posture conveying a sense of mild frustration and confusion]. Set in [a pastel-colored bedroom, slightly messy but cozy, with books scattered on a bedside table and a partially drawn self-portrait on an easel in the background].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients in muted neon pinks and blues.\nLayers: foreground – [the stick figure and the tangled ball of yarn], midground – [the bedside table with books and a partially drawn self-portrait], background – [the pastel-colored bedroom walls with a motivational poster partially visible].\nStick-figure posture: [slightly hunched and slumped, conveying gentle frustration and confusion].\nFacial expression: [a gentle, friendly smile, but eyes slightly downcast, reflecting mild concern].\nAccessory: [a small, tangled ball of yarn representing the subtle self-sabotage].\nMotion cue: [the stick figure gently picking at the tangled yarn, not forcefully pulling at it].\nEnvironment: [a cozy, slightly messy bedroom, symbolizing inner thoughts and feelings].\nSymbolic object: [a tangled ball of yarn representing the confusing, interwoven nature of the subtle self-sabotage].\nColor palette: [muted neon pinks, soft blues, and creamy whites—a Gen Z aesthetic].\n",
+          "ScriptSegment": "a subtle self-sabotage you can't quite put your finger on.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "7",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile, shoulders slumped slightly, head bowed, holding a small, wilting flower] Set in [a dimly lit, cozy bedroom with soft pastel walls, a single, softly glowing moon-shaped nightlight casting a warm glow on the bed].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients in muted neons (soft pinks, blues, and lavenders).\nLayers: foreground – [the stick figure and the wilting flower], midground – [a messy but cozy bed with scattered pillows and blankets], background – [the softly lit bedroom wall with the moon-shaped nightlight].\nStick-figure posture: [slightly slumped shoulders, head bowed, conveying a sense of gentle sadness and self-doubt].\nFacial expression: [gentle, friendly smile, but eyes slightly downcast, reflecting introspection and a hint of sadness].\nAccessory: [a small, wilting flower held gently in the stick figure’s hand].\nMotion cue: [none].\nEnvironment: [a comforting, yet introspective bedroom scene, suggesting self-reflection and quiet contemplation].\nSymbolic object: [the wilting flower representing a sense of self-worth that feels fragile and diminished].\nColor palette: [muted neons and cozy pastels—soft pinks, blues, and lavenders with a touch of deeper purple in the shadows].\n",
+          "ScriptSegment": "Maybe it's that nagging feeling of not being \"good enough,\"",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "8",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing small and slightly hunched, looking up at a looming, whispering shadow] Set in [a pastel-pink and lavender bedroom, with a soft glow emanating from a nightlight shaped like a star].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure, slightly obscured by the shadow], midground – [a fluffy, pastel-colored rug], background – [the bedroom walls with the star-shaped nightlight].\nStick-figure posture: [small, slightly hunched, conveying vulnerability and being overwhelmed].\nFacial expression: [gentle, friendly smile, but eyes slightly downcast, conveying worry but not sadness].\nAccessory: [a small, glowing, heart-shaped keychain clutched in one hand].\nMotion cue: [shadow seems to be emanating whispers, represented by faint, wispy lines extending from it].\nEnvironment: [a calming but slightly unsettling bedroom setting, suggesting inner turmoil].\nSymbolic object: [a large, shadowy figure whispering doubts, looming over the stick figure, representing fear undermining ambitions].\nColor palette: [muted neons—lavender, blush pink, soft teal—with darker shadows representing fear].\n",
+          "ScriptSegment": "a fear whispering doubts that undermine even your most ambitious plans.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "9",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile, standing slightly slumped with shoulders bowed, but still maintaining a hopeful expression—posture conveys a feeling of being weighed down but not defeated]. Set in [a softly lit, pastel-toned bedroom with a messy but cozy feel].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients, using muted neons and cozy pastels.\nLayers: foreground – [the stick figure, slightly obscured by a pile of soft, slightly rumpled blankets and pillows], midground – [a small, brightly lit desk with a half-finished project, a laptop, and a steaming mug], background – [a soft-focus view of city lights visible through a window, representing dreams and aspirations].\nStick-figure posture: [slightly slumped but hopeful, conveying a sense of being burdened but not broken].\nFacial expression: [gentle, friendly smile, dot eyes conveying a hint of weariness, but not sadness].\nAccessory: [a small, glowing heart-shaped nightlight casting a soft glow on the desk, symbolizing inner strength and resilience].\nMotion cue: [none].\nEnvironment: [a bedroom scene that feels personal, intimate, and relatable to Gen Z, suggesting comfort and self-reflection].\nSymbolic object: [a pile of blankets and pillows subtly suggesting the weight of unseen pressures].\nColor palette: [muted neons (blues and pinks) and cozy pastels (cream, light grey) creating a calming yet energetic atmosphere].\n",
+          "ScriptSegment": "This isn't just laziness;",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "10",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile, standing slightly hunched with shoulders slumped, gazing down at a small, tangled ball of yarn in their hands] Set in [a softly lit, pastel-colored room with sunbeams streaming through a window; a half-finished, vibrant knitted blanket lies on a nearby chair].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure and the tangled yarn ball], midground – [the partially knitted blanket on the chair, with soft shadows suggesting warmth and comfort], background – [the sunlit room, with muted neon accents on the wall].\nStick-figure posture: [slightly slumped and pensive, conveying a sense of being burdened but not defeated].\nFacial expression: [gentle, friendly smile, but eyes convey a hint of concern and introspection].\nAccessory: [a small, glowing heart-shaped charm attached to the yarn].\nMotion cue: [none].\nEnvironment: [a cozy, personal space, suggesting introspection and self-reflection].\nSymbolic object: [the tangled ball of yarn representing complex emotions and challenges].\nColor palette: [muted neons—pale blues, lavenders, and soft oranges—with cozy pastel accents].\n",
+          "ScriptSegment": "it's a deeper issue,",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "11",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile, standing slightly hunched with shoulders slumped, looking down at a small, glowing heart in their hands—posture conveying a sense of quiet burden but not defeat]. Set in [a dimly lit, but warmly colored room; the walls are covered in partially-completed passion projects (sketches, half-finished coding projects, etc.), symbolizing unrealized potential].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure holding the small glowing heart, their hands slightly trembling], midground – [a desk strewn with art supplies and technology, representing their aspirations], background – [the warmly lit room with visible, yet incomplete, creative projects on the walls, representing the hurdle of self-doubt].\nStick-figure posture: [slightly hunched, shoulders slumped, but head held at a slightly tilted angle as if considering something carefully and privately].\nFacial expression: [a gentle, relatable smile mixed with a hint of worry and introspection—the dot eyes are slightly downcast].\nAccessory: [a small, glowing heart held gently in their hands, representing their passion and potential but also the vulnerability of that passion].\nMotion cue: [none, the focus is on the internal struggle].\nEnvironment: [a personal workspace, reflecting both potential and the internal struggle].\nSymbolic object: [the small, dimly glowing heart represents the hidden vulnerability of ambition and the fear of failure].\nColor palette: [muted neons—a soft teal and peach blend, with darker blues and purples to represent the shadows of self-doubt].\n",
+          "ScriptSegment": "a psychological hurdle many ambitious Gen Zers secretly face.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "12",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; hunched over, shoulders slumped, looking down at a cluttered desk overflowing with papers and half-finished projects]. Set in [a cluttered, dimly lit room, with rays of sunlight peeking through a slightly ajar window, creating a contrast between the bright outside and the messy interior].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the cluttered desk with papers, pens, and a laptop displaying multiple open tabs], midground – [the stick figure hunched over the desk], background – [a window showing a bright, sunny cityscape].\nStick-figure posture: [dejected, overwhelmed, but not defeated].\nFacial expression: [slightly sad, but with a hint of hope in the dot eyes and gentle smile].\nAccessory: [a tiny, glowing heart-shaped sticky note stuck on a seemingly important document, barely visible beneath the pile of papers].\nMotion cue: [The stick figure is slowly, almost reluctantly, pushing a pile of papers to the side, revealing the tiny glowing heart].\nEnvironment: [a metaphor for feeling busy but unproductive—a visually cluttered and overwhelming space].\nSymbolic object: [the tiny glowing heart representing true productivity, hidden under the clutter of busy-ness].\nColor palette: [muted neons—a pale teal for the desk, a soft orange for the sunlight, and touches of muted pink and purple in the background cityscape].\n",
+          "ScriptSegment": "One of the biggest mistakes is confusing busy-ness with productivity.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "13",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile, hunched slightly over, hands overflowing with small, brightly colored, slightly chaotic scribbled notes and to-do lists] Set in [a cluttered but cozy room, symbolic of a busy mind].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure, surrounded by overflowing notes and tasks], midground – [a desk piled high with books and supplies, slightly blurred], background – [a soft, pastel-colored wall with a motivational quote barely visible].\nStick-figure posture: [slightly overwhelmed but determined, shoulders slumped but head held up].\nFacial expression: [gentle, friendly smile, slightly strained].\nAccessory: [a tiny, glowing backpack overflowing with even more notes, symbolizing the weight of responsibilities].\nMotion cue: [none].\nEnvironment: [a cozy, slightly messy workspace representing the feeling of being overwhelmed but still in a safe and familiar space].\nSymbolic object: [a small, overflowing backpack representing the burden of tasks and responsibilities].\nColor palette: [muted neons—blues, pinks, and greens—with a touch of warm, cozy beige for the background].\n",
+          "ScriptSegment": "You're swamped,",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "14",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; slightly hunched over, shoulders slumped, but with a determined set to the jaw—posture conveying weariness but not defeat]. Set in [a cluttered, yet cozy room; layers suggest a feeling of overwhelm but also comfort].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure surrounded by a whirlwind of tiny, scribbled tasks and to-do lists, some glowing faintly with pastel colors, others dull and grey], midground – [a messy desk with scattered notebooks and half-finished projects, a warm-toned lamp casting a soft glow], background – [a wall covered with inspirational posters and artwork, subtly visible through the clutter].\nStick-figure posture: [slightly hunched, conveying tiredness, but the determined jaw suggests resilience].\nFacial expression: [gentle, friendly smile, but with a hint of weariness in the dot eyes].\nAccessory: [a tiny, glowing backpack overflowing with miniature versions of the to-do list items, suggesting the weight of responsibilities].\nMotion cue: [a faint motion blur around the to-do lists, indicating the constant activity].\nEnvironment: [a cozy but cluttered space representing the feeling of being overwhelmed by tasks].\nSymbolic object: [the overflowing backpack, representing the weight of \"doing\" too much].\nColor palette: [muted neons—blues and greens for the tasks, with warm oranges and yellows for the lamp and positive elements, creating a balance of overwhelm and comfort].\n",
+          "ScriptSegment": "constantly \"doing\" things,",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "15",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; slumped shoulders, head slightly bowed, looking down at a tiny, distant goal at the top of a seemingly endless, winding staircase]. Set in [a dreamlike, pastel-colored landscape with soft, blurry mountains in the background and a hazy, glowing sunset].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure sits on a single, large, slightly worn step of the staircase, a small backpack beside them], midground – [the seemingly endless, winding staircase stretches upward into the hazy sunset, each step slightly smaller than the last, creating a sense of distance], background – [soft, blurry pastel mountains bathed in the warm glow of the setting sun].\nStick-figure posture: [slouched, conveying a sense of weariness and discouragement, but still maintaining a gentle, relatable posture].\nFacial expression: [a gentle, friendly, but slightly sad smile—the dot eyes convey a sense of mild disappointment, not despair].\nAccessory: [a small, worn backpack overflowing with tiny, brightly colored papers representing goals and dreams—these papers are slightly crumpled, indicating some sense of overwhelm].\nMotion cue: [none—the focus is on the emotional state of the stick figure].\nEnvironment: [a dreamy, slightly melancholic landscape evoking a feeling of being overwhelmed by the distance to one's goals].\nSymbolic object: [the impossibly long staircase representing the perceived distance to their goals].\nColor palette: [muted neons—a mix of soft pinks, blues, and purples with touches of a warm, hazy orange from the sunset].\n",
+          "ScriptSegment": "yet somehow feel further away from your goals than ever.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "16",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile, looking overwhelmed and slightly slumped, shoulders rounded] Set in [a cluttered room filled with half-finished projects and brightly colored sticky notes; a digital calendar overflowing with appointments dominates the midground].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure surrounded by scattered papers and half-finished crafts], midground – [a desk overflowing with books, laptops, and a digital calendar flashing red notifications], background – [a blurred cityscape at night, suggesting a feeling of being overwhelmed by external pressures].\nStick-figure posture: [overwhelmed but still hopeful, not defeated].\nFacial expression: [slightly worried but still maintains a gentle, relatable smile; dot eyes slightly widened].\nAccessory: [a tiny, glowing, heart-shaped backpack, almost hidden under the weight of papers].\nMotion cue: [the stick figure’s head is slightly bowed, but they are not actively moving, suggesting stillness and overwhelm].\nEnvironment: [a chaotic but colorful workspace, suggesting busyness and a struggle to keep up].\nSymbolic object: [a digital calendar overflowing with appointments and tasks, representing the \"activity trap\" itself].\nColor palette: [muted neons—a blend of electric blues, soft pinks, and muted oranges—with a touch of cozy pastel yellow for the tiny glowing heart backpack].\n",
+          "ScriptSegment": "This is the \"activity trap,\"",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "17",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; running in place frantically, slightly hunched over with a look of mild frustration but maintaining the friendly smile] Set in [a cluttered, brightly-lit room, symbolizing a busy mind, with layers of half-finished projects and scattered notes]\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure running in place, legs a blur], midground – [a desk piled high with colorful, but unfinished projects and notes with barely visible words—a subtle suggestion of overwhelming tasks], background – [a soft, out-of-focus pastel sunset, representing the missed opportunities or lack of forward momentum].\nStick-figure posture: [frantically running in place, slightly hunched]\nFacial expression: [mildly frustrated but still smiling gently—the eyes convey the struggle while the smile shows resilience]\nAccessory: [a small, glowing heart-shaped stopwatch that is constantly ticking but not moving forward—representing time slipping away despite activity]\nMotion cue: [running in place rapidly, a slight blur on the legs]\nEnvironment: [a brightly lit, slightly messy room, feeling busy and chaotic but not overwhelmingly negative]\nSymbolic object: [the glowing heart-shaped stopwatch that's frozen—a visible representation of wasted time and energy]\nColor palette: [muted neons—pinks, blues, and teals—with soft pastel yellow accents for the background sunset]\n",
+          "ScriptSegment": "a phenomenon where constant motion masks a lack of focused progress,",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "18",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled hair, dot eyes, and a gentle, friendly smile—standing confidently, but with a slight tilt of the head, thoughtfully considering a list]. Set in [a brightly lit, minimalist workspace with a soft, pastel color scheme; a large whiteboard covered in prioritized tasks with lines connecting them is visible in the background, along with scattered, neatly organized notebooks].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients, using a muted neon color palette.\nLayers: foreground – [the stick figure holding a small, glowing notepad with a single, circled task item highlighted], midground – [the whiteboard with interconnected task lists, showing a clear prioritization system], background – [softly glowing pastel colored geometric shapes representing different areas of life].\nStick-figure posture: [thoughtful and confident, body language conveys a sense of calm control].\nFacial expression: [a gentle, focused smile].\nAccessory: [a small, glowing notepad with a single circled item].\nMotion cue: [none].\nEnvironment: [a calm, organized, and productive workspace, symbolizing clarity and focus].\nSymbolic object: [a glowing notepad with a single, circled task representing the focused prioritization of a single, most important task].\nColor palette: [muted neons and soft pastels—think light blues, pinks, and oranges with touches of neon yellow].\n",
+          "ScriptSegment": "as highlighted by Tim Ferriss's emphasis on effective prioritization.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "19",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing slightly hunched, looking down at a large, shimmering, golden key in their hands, a look of hesitant wonder on their face]. Set in [a sun-drenched meadow with tall grass swaying gently in the breeze, a path leading to a distant, radiant city on a hill]. Style: doodle cartoon with textured brush outlines. Shading & Gradients: soft shading and gentle gradients. Layers: foreground – [the stick figure holding the key, grass blades in sharp focus], midground – [the path stretching towards the city, slightly blurred], background – [the radiant city on the hill, soft focus and glow]. Stick-figure posture: [hesitant, slightly hunched, but not defeated]. Facial expression: [wonder mixed with apprehension; dot eyes wide, gentle smile slightly strained]. Accessory: [a large, golden, ornate key radiating a soft golden glow]. Motion cue: [the stick figure gently turning the key over in their hands]. Environment: [optimistic, yet slightly daunting; a feeling of potential and possibility juxtaposed with uncertainty]. Symbolic object: [the large golden key representing success, the distant city representing the fear of achieving it]. Color palette: [muted neons—soft yellows and oranges for the sunlight and city, contrasted with cool blues and greens in the meadow].\n",
+          "ScriptSegment": "Another hidden reason for this self-sabotage is the fear of success itself.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "20",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; leaning back slightly, looking up at a large question mark with a slightly surprised, yet hopeful expression; posture conveys a mix of disbelief and intrigued curiosity]. Set in [a whimsical, cloud-filled sky with a single, brightly lit path winding upwards into the clouds, layers of soft, pastel clouds creating depth].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients using muted neons (blues and pinks).\nLayers: foreground – [the stick figure, slightly below the question mark], midground – [the winding path, glowing faintly], background – [a vast, dreamy sky filled with fluffy pastel clouds].\nStick-figure posture: [leaning back, head tilted up, conveying surprised curiosity, not fear or doubt].\nFacial expression: [surprised, hopeful, and slightly bewildered—dot eyes and a gentle, relatable smile are maintained].\nAccessory: [a small, glowing thought bubble above the stick figure's head, containing a tiny, sketched drawing of a mountain].\nMotion cue: [a gentle upward breeze ruffling the stick figure’s hair].\nEnvironment: [a whimsical, optimistic, and slightly surreal sky].\nSymbolic object: [a large, friendly, cartoon question mark glowing softly in muted neon pink, implying wonder and possibility rather than uncertainty].\nColor palette: [muted neons (blues and pinks) blending into soft pastel yellows and whites for the clouds].\n",
+          "ScriptSegment": "Sounds crazy, right?",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "21",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing on the edge of a cliff, looking out at a vast, colorful landscape, a slight hesitant expression on its face, but still smiling gently] Set in [a whimsical, dreamlike landscape with layers of vibrant clouds and a distant, sun-drenched city].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure standing at the cliff edge, small wildflowers blooming around their feet], midground – [rolling hills and fluffy clouds painted in muted neons and pastels], background – [a shimmering, futuristic city visible in the distance, a symbol of achievement].\nStick-figure posture: [slightly hesitant, but hopeful and curious, leaning forward as if considering the jump].\nFacial expression: [gentle smile, eyes wide with a mixture of apprehension and excitement].\nAccessory: [a small, glowing backpack representing the weight of comfort, gradually dimming as it fades to a light blue color].\nMotion cue: [the stick figure is frozen mid-step, foot slightly lifted as if about to step off the cliff].\nEnvironment: [a surreal, beautiful landscape representing the potential for growth and adventure beyond comfort].\nSymbolic object: [the cliff represents the comfort zone, the vast landscape beyond represents the unknown potential of achieving goals].\nColor palette: [a blend of muted neons for the clouds and city, and cozy pastels for the hills and flowers, creating a moody but hopeful contrast].\n",
+          "ScriptSegment": "But what if achieving your goals means stepping outside your comfort zone,",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "22",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing bravely but slightly hunched, facing a large, shadowy figure representing insecurity, but with a determined expression] Set in [a dimly lit, yet hopeful, forest clearing with glowing fireflies in the background].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure, slightly illuminated by a nearby glowing mushroom], midground – [the shadowy, amorphous figure of insecurity, partially translucent to reveal a small, flickering light within], background – [a dark forest clearing, but with numerous glowing fireflies, creating a sense of hope and possibility].\nStick-figure posture: [slightly hunched but determined, facing the insecurity directly, but not aggressively].\nFacial expression: [determined, yet gentle; maintaining the dot eyes and gentle smile, but with a slight furrow in the brow, conveying focus and resolve].\nAccessory: [a small, glowing heart held gently in one hand].\nMotion cue: [the stick figure is standing still, but the glowing heart pulses softly].\nEnvironment: [a dark, yet hopeful forest clearing representing the inner world, with glowing fireflies symbolizing perseverance].\nSymbolic object: [the shadowy figure of insecurity, partially translucent and containing a small, flickering light within, representing the fact that even insecurities hold a small glimmer of vulnerability].\nColor palette: [moody contrasts—dark blues and purples for the forest, contrasted with warm oranges and yellows from the glowing heart and fireflies].\n",
+          "ScriptSegment": "confronting your deepest insecurities,",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "23",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing confidently, shoulders slightly back, a subtle upward tilt to the head—posture conveying self-assurance and positive change; ensure posture and actions are always wholesome, safe, and fully clothed. The stick figure’s appearance (hair, eyes, face, smile) should be visually consistent in every scene, never exaggerated or cartoonish]. Set in [a sun-drenched meadow with a winding path leading to a brightly lit mountain peak in the distance; soft, dreamy atmosphere].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure standing on a small, vibrant green hill, tiny wildflowers scattered around their feet], midground – [the gently sloping meadow, with a path gradually ascending towards the distant mountain peak], background – [a clear blue sky, partly covered by fluffy white clouds, with the peak of a mountain bathed in golden sunlight].\nStick-figure posture: [confident, self-assured, yet approachable and relatable].\nFacial expression: [a gentle, hopeful smile—eyes bright and looking towards the mountain peak].\nAccessory: [a small backpack filled with colorful, glowing objects resembling small, vibrant stars].\nMotion cue: [the stick figure is slightly facing towards the mountain peak; head tilted up, looking towards it with determination].\nEnvironment: [peaceful, hopeful, and motivational landscape representing personal growth and overcoming challenges].\nSymbolic object: [the mountain peak, representing the achievement of self-transformation and the journey of personal growth].\nColor palette: [a blend of pastel yellows, soft oranges, sky blues, and gentle greens, with a touch of muted neon pink in the wildflowers].\n",
+          "ScriptSegment": "and ultimately changing who you are?",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "24",
+          "TTMPrompt": "TTM Prompt:\n\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing small and slightly hunched, looking up at a towering, looming mountain of dark, swirling clouds] Set in [a vast, open landscape under a stormy sky].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients, using muted neons and deep blues in the sky, contrasting with warmer tones on the stick figure.\nLayers: foreground – [the stick figure, tiny against the immense cloud mountain], midground – [the base of the cloud mountain, textured with darker, swirling shades], background – [a hazy, slightly blurred landscape of muted greens and purples, suggesting distance and the vastness of the challenge].\nStick-figure posture: [small, slightly hunched, conveying a feeling of being overwhelmed but not defeated].\nFacial expression: [dot eyes conveying a mixture of awe and apprehension, gentle, relatable smile still present but smaller].\nAccessory: [a small, glowing backpack with a tiny flickering light inside, suggesting inner strength and hope].\nMotion cue: [a slight tremble in the stick figure's posture].\nEnvironment: [a symbolic representation of fear and the daunting nature of a large challenge].\nSymbolic object: [the towering cloud mountain represents the overwhelming nature of the \"terrifying\" challenge].\nColor palette: [moody contrasts of deep blues and purples in the sky, contrasted with soft, warm peach tones for the stick figure and the small light in the backpack].\n",
+          "ScriptSegment": "That's terrifying.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "25",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing small and slightly hunched, looking down at a large, shadowy, looming mountain in the distance, hands clasped loosely in front of them]. Set in [a vast, slightly hazy valley with soft, pastel-colored rolling hills, a single, imposing, dark mountain dominating the background—the valley feels both peaceful and daunting].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients, with a slight darkening around the base of the mountain.\nLayers: foreground – [the stick figure, slightly blurred to emphasize the distance], midground – [the gently sloping hills, fading into a light mist], background – [the large, dark, slightly textured mountain, almost obscuring the sky].\nStick-figure posture: [small, slightly hunched, conveying a feeling of being overwhelmed but not defeated].\nFacial expression: [a gentle, slightly worried but hopeful smile; dot eyes looking downward].\nAccessory: [a small, glowing, pastel-pink heart clutched in one hand, barely visible].\nMotion cue: [none].\nEnvironment: [a valley that evokes a feeling of both potential and challenge; a sense of vastness and the daunting nature of self-doubt].\nSymbolic object: [the large, dark mountain representing imposter syndrome; the small glowing heart representing inner strength and hope].\nColor palette: [muted neons—pale lavender hills, a deep indigo mountain, a soft turquoise sky, accented with the pink heart].\n",
+          "ScriptSegment": "This is where imposter syndrome thrives,",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "26",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile, standing slightly hunched with shoulders slumped, looking down at a small, cracked mirror reflecting a distorted, slightly blurry image of themselves] Set in [a dimly lit, cozy attic room with soft, diffused light streaming through a single window.  Dust motes dance in the light beams].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure and the cracked mirror], midground – [a pile of old, slightly worn books and a half-finished jigsaw puzzle on a wooden table], background – [the attic room with exposed beams and rafters, soft pastel-toned walls].\nStick-figure posture: [slightly hunched and hesitant].\nFacial expression: [concerned, but still with the gentle, friendly smile, conveying vulnerability rather than sadness].\nAccessory: [a small, glowing heart clutched in one hand, slightly dimmed].\nMotion cue: [none].\nEnvironment: [a reflective space representing self-doubt and introspection, but with a hint of coziness and hope].\nSymbolic object: [the cracked mirror reflecting a distorted self-image].\nColor palette: [muted neons—a soft teal and dusty rose with accents of pale orange in the light beams].\n",
+          "ScriptSegment": "making you question your abilities,",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "27",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing slightly slumped but with a determined tilt of the head, holding a small, glowing trophy aloft with one hand. The other hand rests lightly on a pile of smaller, dimmer trophies.]. Set in [a softly glowing, pastel-hued cityscape at twilight, with layered clouds forming a gentle halo above the stick figure’s head].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients in muted neons (blues, pinks, and lavenders).\nLayers: foreground – [the stick figure, the trophies, a few floating, glowing stars], midground – [the cityscape, with soft, blurry lights indicating buildings], background – [the layered clouds, slightly darker at the edges to create depth, glowing with a soft, warm light].\nStick-figure posture: [slightly slumped, but with a determined, hopeful tilt of the head, showing resilience despite the weight of achievements].\nFacial expression: [a gentle, friendly smile, but with a hint of weariness or quiet contemplation in the dot eyes].\nAccessory: [a small, glowing trophy held aloft in one hand; a pile of slightly dimmer trophies at their feet].\nMotion cue: [the figure is static but the glow of the trophies subtly pulses].\nEnvironment: [a peaceful yet slightly melancholic cityscape at twilight, representing the quiet reflection after achievement].\nSymbolic object: [a single, brightly glowing trophy among many slightly dimmer ones; symbolizing the ongoing journey despite past successes].\nColor palette: [muted neons (blues, pinks, lavenders) blended with cozy pastels (light creams, soft greys) for a calming yet hopeful mood].\n",
+          "ScriptSegment": "even after undeniable achievements.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "28",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing determinedly at the base of a gently sloping hill, looking upward with a hopeful expression, one small hand lightly grasping a worn, but sturdy rope ladder]. Set in [a soft, pastel-toned landscape with a sun-drenched sky and a field of wildflowers in the midground, layered with soft, hazy clouds].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients using muted neons and cozy pastels.\nLayers: foreground – [the stick figure and the base of the rope ladder], midground – [a field of wildflowers gently swaying in a breeze, indicating a positive, hopeful environment], background – [a clear, bright sky with soft, fluffy clouds suggesting a path forward].\nStick-figure posture: [determined but not strained; showing perseverance and a sense of steady progress].\nFacial expression: [hopeful, determined, and optimistic, maintaining the dot eyes and gentle smile].\nAccessory: [a worn, but sturdy rope ladder, symbolizing the journey and the effort required to reach the summit—a metaphor for perseverance].\nMotion cue: [the stick figure is subtly implied to be starting their ascent, conveying a sense of gentle motion].\nEnvironment: [a sun-drenched field, suggesting warmth and encouragement, symbolizing a positive and supportive environment].\nSymbolic object: [the rope ladder leading upwards to an unseen summit represents the journey towards achieving goals through grit and perseverance].\nColor palette: [a blend of muted neons (like a soft, light teal and peach) and cozy pastels (like lavender and cream), creating a calming and inspiring atmosphere].\n",
+          "ScriptSegment": "Remember, as Angela Duckworth's research on grit shows, perseverance and passion are crucial,",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "29",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; sitting cross-legged, gently hugging a plush, slightly worn heart-shaped pillow] Set in [a softly lit, pastel-colored bedroom, with books scattered on a bedside table and fairy lights strung across the wall].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients, predominantly using muted neons.\nLayers: foreground – [the stick figure hugging the pillow], midground – [the bedside table with books and fairy lights], background – [a softly blurred wall with pastel-colored paint splotches].\nStick-figure posture: [relaxed and self-soothing].\nFacial expression: [gentle, kind, and understanding].\nAccessory: [a slightly worn, heart-shaped pillow].\nMotion cue: [none].\nEnvironment: [a cozy and comforting bedroom].\nSymbolic object: [the worn heart-shaped pillow representing self-compassion and acceptance of imperfections].\nColor palette: [a mix of muted neons (light blues and pinks) and cozy pastels (cream and light grey)].\n",
+          "ScriptSegment": "but you also need self-compassion.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "30",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing tall but slightly slumped, shoulders relaxed, holding a small, glowing heart in both hands; posture conveys a quiet sense of self-acceptance]. Set in [a dreamy, pastel-colored landscape with fluffy clouds in the background].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients in muted neons (pale pinks, blues, and lavenders).\nLayers: foreground – [the stick figure, holding the glowing heart, surrounded by a few soft, floating pastel-colored clouds], midground – [a gently rolling hill of soft, pastel-colored grass], background – [a clear sky with fluffy, pastel clouds].\nStick-figure posture: [relaxed but slightly slumped, conveying a sense of quiet self-acceptance, not sadness or defeat].\nFacial expression: [a gentle, friendly smile; dot eyes looking slightly downwards, thoughtful but not sad].\nAccessory: [a small, glowing heart radiating soft light].\nMotion cue: [none].\nEnvironment: [a peaceful, dreamy landscape representing inner peace and self-worth].\nSymbolic object: [the glowing heart represents intrinsic worth, independent of accomplishments; its gentle light symbolizes self-love and acceptance].\nColor palette: [muted neons and cozy pastels—pale pinks, blues, lavenders, and soft yellows].\n",
+          "ScriptSegment": "Don't fall into the trap of believing your worth is solely tied to your accomplishments.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "31",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile, standing slightly back, hand to chin in a thoughtful pose; posture conveys contemplation and mild surprise] Set in [a three-layered dreamscape].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure, slightly blurred, amidst floating, glowing pastel-colored puzzle pieces], midground – [a swirling vortex of muted neon colors representing overwhelming options], background – [a calm, starry night sky with a single, brightly shining star].\nStick-figure posture: [thoughtful, slightly surprised, leaning back].\nFacial expression: [gentle surprise, maintaining the dot eyes and friendly smile].\nAccessory: [a small, glowing notepad with a single, large question mark drawn on it].\nMotion cue: [subtle swirling motion of the puzzle pieces and neon vortex].\nEnvironment: [a surreal, calming yet thought-provoking dreamscape].\nSymbolic object: [the glowing question mark on the notepad, representing the shocking truth and the need for further exploration].\nColor palette: [muted neons (blues and pinks) blending into cozy pastels (light blues and creams) against a dark navy background].\n",
+          "ScriptSegment": "A third, shocking truth?",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "32",
+          "TTMPrompt": "TTM Prompt Format:\n\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; slumped posture, shoulders slightly rounded, head tilted down, holding a tiny, perfectly crafted paper airplane that is far too intricate and detailed for its size] Set in [a messy, yet cozy room; layers of scattered art supplies, half-finished projects, and inspirational posters subtly clashing with the feeling of being overwhelmed].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure, meticulously crafting the paper airplane, surrounded by a pile of perfectly folded origami cranes], midground – [a desk cluttered with art supplies, half-finished paintings, and a laptop showing a to-do list overflowing with tasks], background – [a wall with inspirational posters, but also a visible pile of crumpled paper airplanes in the corner].\nStick-figure posture: [slumped, conveying a sense of being weighed down by perfectionism].\nFacial expression: [a gentle, but slightly disheartened smile—dot eyes slightly downturned].\nAccessory: [a tiny, perfectly crafted paper airplane that is far too intricate and detailed, representing the overwhelming pressure of perfection].\nMotion cue: [the stick figure meticulously folds the paper airplane, but their movements are slow and hesitant].\nEnvironment: [a cozy, creative space, yet cluttered and overwhelmed by the pursuit of perfection].\nSymbolic object: [the meticulously crafted, yet ultimately insignificant, paper airplane—a metaphor for perfectionism hindering progress].\nColor palette: [muted neons—pale blues, lavender, and a touch of coral].\n",
+          "ScriptSegment": "You might be sabotaging yourself through perfectionism.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "33",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing at the base of a gently sloping hill, reaching upward toward a sun-drenched peak, posture conveying hopeful determination]. Set in [a dreamy, pastel landscape with layers of soft clouds, a gently sloping hill, and a sunlit peak].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients in muted neons and pastels.\nLayers: foreground – the stick figure reaching upward, midground – the gently sloping hill covered in soft, pastel-colored wildflowers, background – a vibrant sunset sky with fluffy clouds.\nStick-figure posture: reaching upward with a determined yet relaxed posture.\nFacial expression: determined optimism; dot eyes and a gentle, friendly smile.\nAccessory: a small backpack overflowing with brightly colored, glowing mini-stars, symbolizing goals and aspirations.\nMotion cue: slightly blurred lines suggesting movement upwards.\nEnvironment: a hopeful and inspiring landscape evoking a sense of journey and achievement.\nSymbolic object: The sunlit peak representing excellence and the hill representing the journey to achieve it.\nColor palette: muted neons and cozy pastels, with a vibrant sunset in the background.\n",
+          "ScriptSegment": "Striving for excellence is admirable,",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "34",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing frozen, arms slightly outstretched, as if reaching for something just out of reach, conveying a sense of hesitant anticipation]. Set in [a vibrant, pastel-colored dreamscape with soft, fluffy clouds forming a path that leads to a distant, shimmering, perfectly formed cityscape].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients, with a slight glow around the cityscape.\nLayers: foreground – [the stick figure, slightly blurred to emphasize the feeling of being stuck], midground – [a cloud pathway stretching towards the cityscape], background – [the idealized cityscape, softly glowing and detailed, suggesting perfect achievement].\nStick-figure posture: [hesitant, frozen, reaching].\nFacial expression: [a gentle, friendly smile, slightly strained, reflecting internal conflict—dot eyes convey a look of uncertainty].\nAccessory: [a small, glowing backpack overflowing with perfectly crafted, miniature versions of the city buildings from the background— symbolizing the weight of perfectionism].\nMotion cue: [none, the stick figure is frozen in place, emphasizing paralysis].\nEnvironment: [a dreamy, aspirational, yet slightly daunting dreamscape—the contrast between the attainable city and the frozen figure highlights the internal struggle].\nSymbolic object: [the perfectly formed cityscape represents flawless execution; the overflowing backpack symbolizes the overwhelming pressure for perfection].\nColor palette: [muted neons—pinks, blues, and greens—with a soft, pastel overlay, conveying both hope and apprehension].\n",
+          "ScriptSegment": "but aiming for flawless execution often leads to paralysis.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "35",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing frozen, shoulders slumped slightly, gazing down at a large, cracked, and seemingly insurmountable wall in front of them] Set in [a dimly lit, but warmly toned, abstract dreamscape].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients, with a slightly brighter glow around the stick figure's head.\nLayers: foreground – [the stick figure and the large, cracked wall, which is subtly glowing with muted neon colours from within the cracks], midground – [a hazy, pastel-colored path stretching towards a distant, brighter area, barely visible behind the wall], background – [soft, blurry clouds in muted neons and pastels, suggesting a hopeful sky].\nStick-figure posture: [slumped shoulders, slightly bowed head, conveying a sense of being overwhelmed but not defeated].\nFacial expression: [gentle, friendly smile, but eyes conveying a sense of worry and hesitation, slightly downturned].\nAccessory: [a small, glowing heart-shaped light floating near the stick figure's hand, pulsating gently].\nMotion cue: [none].\nEnvironment: [an internal psychological landscape representing the fear of failure].\nSymbolic object: [the large, cracked wall represents the fear of making mistakes, while the glowing heart represents inner strength and hope].\nColor palette: [a mix of muted neons (blues and purples in the cracks of the wall) and cozy pastels (pinks and yellows in the sky and path), creating a moody yet hopeful contrast].\n",
+          "ScriptSegment": "The fear of making mistakes can completely halt your progress,",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "36",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; slumped posture, shoulders slightly hunched, head down— conveying a sense of being weighed down but not defeated] Set in [a dimly lit, but warm-toned forest clearing with layers of mist and dappled sunlight].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure, surrounded by heavy, dark grey vines that intertwine around their legs but don’t restrict movement completely], midground – [tall, slender trees with muted neon pink leaves, partially obscuring the background], background – [a soft, pastel orange glow suggesting a distant sunrise or sunset].\nStick-figure posture: [slumped, but with a hint of determination in the slight tilt of the head].\nFacial expression: [a gentle, friendly smile, but eyes slightly downcast, reflecting weariness, not sadness].\nAccessory: [a small, glowing neon-yellow backpack overflowing with oversized, colorful pom-poms, symbolizing dreams and aspirations being weighed down].\nMotion cue: [the vines subtly pulling downwards on the figure’s legs].\nEnvironment: [a clearing in a forest, suggesting challenges and obstacles, but also a sense of hope and potential breakthrough].\nSymbolic object: [heavy vines representing obstacles hindering progress].\nColor palette: [muted neons (pink, yellow) and cozy pastels (orange, grey), creating a moody but hopeful contrast].\n",
+          "ScriptSegment": "hindering your forward momentum.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "37",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; slightly hunched over, but with a determined expression, holding a small, glowing, partially-formed heart in their hands] Set in [a dreamy, pastel-colored landscape with layered clouds and a soft, radiant sun].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients using muted neon pinks and blues.\nLayers: foreground – [the stick figure, holding the glowing heart, surrounded by smaller, less-formed hearts], midground – [rolling hills of soft, pastel clouds], background – [a bright, but not harsh, sun peeking through the clouds].\nStick-figure posture: [slightly hunched over, but with a determined and hopeful posture, conveying effort and perseverance].\nFacial expression: [determined yet peaceful, maintaining the dot eyes and gentle smile].\nAccessory: [a small, glowing, partially formed heart, symbolizing progress rather than perfection].\nMotion cue: [the stick figure is gently cradling and seemingly nurturing the glowing heart].\nEnvironment: [a calming, hopeful, and slightly whimsical landscape].\nSymbolic object: [the partially formed, glowing heart represents progress; the fully formed hearts in the background symbolize the potential future].\nColor palette: [muted neon pinks, blues, and soft yellows, creating a calm and hopeful atmosphere].\n",
+          "ScriptSegment": "Instead of aiming for perfect, strive for progress;",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "38",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; jumping joyfully with arms raised in a V-shape, legs slightly apart]. Set in [a vibrant, pastel-colored bedroom with a sunbeam streaming through the window, illuminating dust motes].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients using muted neons.\nLayers: foreground – [the stick figure mid-jump], midground – [a neatly made bed with a few scattered books and a glowing, heart-shaped nightlight on the bedside table], background – [a softly blurred cityscape visible through the window, rendered in soft, hazy pastels].\nStick-figure posture: [exuberant and joyful, small jump of celebration].\nFacial expression: [pure, unadulterated joy, a wide, but gentle, friendly smile].\nAccessory: [a small, glowing constellation-shaped sticker on the stick figure’s shirt—representing small accomplishments adding up to something big].\nMotion cue: [a slight upward motion blur on the stick figure, suggesting the jump].\nEnvironment: [a cozy, personalized bedroom, suggesting a safe and happy space for self-reflection and accomplishment].\nSymbolic object: [the glowing heart-shaped nightlight, symbolizing the warmth and positive energy of celebrating small wins].\nColor palette: [a blend of cozy pastels—light blues, pinks, and lavenders—with accents of muted neon pinks and oranges in the cityscape].\n",
+          "ScriptSegment": "celebrate small wins,",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "39",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; confidently striding uphill, arms slightly pumping in a positive, energetic manner] Set in [a vibrant, sun-drenched hillside landscape].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure walking confidently uphill], midground – [a gently sloping hill dotted with small, brightly colored flowers], background – [a clear blue sky with fluffy white clouds].\nStick-figure posture: [confident and determined uphill stride].\nFacial expression: [determined yet happy, maintaining the dot eyes and gentle smile].\nAccessory: [a small backpack overflowing with brightly colored, glowing mini-stars].\nMotion cue: [walking uphill with a determined yet joyful stride].\nEnvironment: [a motivational, encouraging, and optimistic hillside landscape—symbolizing progress].\nSymbolic object: [the uphill climb representing the challenges overcome; the glowing stars representing accumulating achievements and confidence].\nColor palette: [muted neons—blues, pinks, and oranges—accentuated by soft yellows and greens].\n",
+          "ScriptSegment": "which will build your confidence and momentum,",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "40",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing atop a mountain peak, arms outstretched in a pose of accomplishment, but not overly dramatic] Set in [a stylized, layered mountain landscape with a sunrise in the background].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure standing on the peak, with small wildflowers around their feet], midground – [rolling hills leading up to the peak, painted in muted neons and pastels], background – [a vibrant sunrise breaking through clouds, in warm oranges, pinks and purples].\nStick-figure posture: [confident and victorious, but still approachable and relatable].\nFacial expression: [a gentle, proud smile, dot eyes shining with a sense of achievement].\nAccessory: [a small, glowing backpack representing the weight of challenges overcome].\nMotion cue: [a gentle breeze ruffling the stick figure’s hair].\nEnvironment: [a peaceful, inspiring mountaintop at dawn—symbolizing reaching the summit of one’s goals].\nSymbolic object: [the mountain peak represents the achievement, the sunrise represents a new beginning, and the wildflowers symbolize small joys along the way].\nColor palette: [muted neons (pinks, oranges, blues) blending into cozy pastels (lavender, light greens) for the sunrise and landscape, with slightly darker, earth tones for the mountain itself].\n",
+          "ScriptSegment": "ultimately leading you to greater achievements.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "41",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile, slumped slightly with shoulders bowed, holding a small, dull, grey pebble in their hand] Set in [a sun-drenched meadow with a vibrant, overgrown path leading towards a distant, shimmering city on a hill].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure, the pebble, blades of overgrown grass], midground – [the winding path, wildflowers blooming along the path], background – [the distant, radiant city bathed in warm sunlight, slightly hazy].\nStick-figure posture: [slightly slumped, conveying a sense of undervaluing oneself].\nFacial expression: [gentle, friendly smile, but eyes slightly downcast and pensive].\nAccessory: [a small, dull, grey pebble representing their undervalued strength].\nMotion cue: [none].\nEnvironment: [a hopeful yet slightly melancholic meadow, representing untapped potential].\nSymbolic object: [the small, dull grey pebble, which shines faintly with an inner light when viewed closely, symbolizing hidden potential].\nColor palette: [muted neons—a pastel yellow meadow, soft orange wildflowers, and a sky gradient from a pale blue to a soft lavender, with the city glowing with a muted coral].\n",
+          "ScriptSegment": "And a fourth warning sign is undervaluing your unique strengths.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "42",
+          "TTMPrompt": "TTM Prompt Format:\n\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; hunched slightly, shoulders slumped, looking down at a multiple-reflection mirror showing many distorted versions of itself] Set in [a dimly lit, cozy room with soft pastel walls and a single window letting in a muted neon light].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure looking down at the multiple reflection mirror], midground – [the ornate, slightly tarnished mirror itself], background – [the soft pastel walls of the room, and a single muted neon light from the window, casting soft shadows].\nStick-figure posture: [slumped, slightly dejected, but not defeated].\nFacial expression: [a gentle, slightly worried smile—dot eyes looking downward].\nAccessory: [a small, glowing heart clutched in one hand].\nMotion cue: [slowly tilting the mirror to see the reflections better—a subtle, gentle movement].\nEnvironment: [a personal, introspective space suggesting feelings of self-doubt and comparison].\nSymbolic object: [a multiple-reflection mirror showing distorted, countless reflections of the stick figure, symbolizing self-comparison and the feeling of being lost in the multitude of others’ perceived successes].\nColor palette: [muted neons—blues, lavenders, and a touch of rose, with soft pastel accents for the walls and shadows].\n",
+          "ScriptSegment": "You constantly compare yourself to others,",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "43",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; hunched over, shoulders slumped, looking down at a small, wilting flower in their hand—posture conveys sadness and discouragement]. Set in [a dimly lit, cluttered room; a metaphorical representation of a mind overwhelmed with negativity].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure holding the wilting flower], midground – [a pile of crumpled papers representing unmet expectations and a large, dark shadow looming over the figure], background – [a muted, blurry cityscape suggesting a feeling of being lost and overwhelmed].\nStick-figure posture: [hunched over, shoulders slumped, conveying sadness and discouragement].\nFacial expression: [sad, but still with the gentle, relatable smile; dot eyes looking downcast].\nAccessory: [a wilting flower in their hand, representing unrealized potential].\nMotion cue: [none].\nEnvironment: [a cluttered, dimly lit room representing a mind cluttered with negative thoughts].\nSymbolic object: [a wilting flower contrasted with a bright, unseen sun shining faintly through the window—representing the potential for growth, obscured by self-doubt].\nColor palette: [muted teal and dusty rose with hints of a brighter, almost unseen yellow light filtering through the window].\n",
+          "ScriptSegment": "focusing on what you lack rather than embracing what makes you special.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "44",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; slumped posture, looking slightly downcast but still maintaining a hopeful expression] Set in [a hazy, digital landscape with layers of overlapping social media interfaces and a subtly shimmering, distorted reflection of the stick figure in the foreground].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients, slightly desaturated colors.\nLayers: foreground – [the stick figure, partially obscured by a translucent, shimmering screen showing idealized images of other stick figures], midground – [a blurred cityscape representing the online world, with glowing icons and notifications], background – [a soft, pastel sky with a few fluffy clouds].\nStick-figure posture: [slumped shoulders, head slightly bowed, but the overall posture conveys a feeling of mild disappointment rather than defeat].\nFacial expression: [gentle, friendly smile slightly softened, eyes looking downcast but hopeful].\nAccessory: [a small, cracked screen mirroring the distorted reflection in the foreground, showing an incomplete and unrealistic self-portrait].\nMotion cue: [none].\nEnvironment: [a digital space feeling both alluring and suffocating, representing the pressure of online personas].\nSymbolic object: [the cracked screen mirroring an unrealistic self-portrait, representing the trap of curated online personas].\nColor palette: [muted neons—blues, pinks, and purples—with touches of desaturated oranges and yellows to convey a feeling of both the vibrancy and the slightly muted reality of online life].\n",
+          "ScriptSegment": "In the age of curated online personas, it's easy to fall into this trap;",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "45",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing tall and confidently, holding a small, glowing heart in one hand, and gently pushing away a shadowy figure resembling a distorted mirror reflection of themselves with the other.] Set in [a pastel-colored meadow with soft, glowing clouds in the sky and a path leading towards a bright, sunlit horizon].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients of muted neons (blues and pinks).\nLayers: foreground – [the stick figure, sharply defined, holding the heart and pushing away the mirror reflection], midground – [the meadow with soft, long grass], background – [the bright sky with glowing clouds and the distant, sunlit horizon].\nStick-figure posture: [confident, strong, gently pushing away the negativity].\nFacial expression: [a gentle, friendly, yet determined smile].\nAccessory: [a small, glowing heart, radiating warmth and positivity].\nMotion cue: [gently pushing away the distorted reflection].\nEnvironment: [a peaceful, hopeful meadow representing self-acceptance].\nSymbolic object: [the distorted mirror reflection representing self-comparison, and the glowing heart representing self-love and joy].\nColor palette: [pastel pinks, blues, and soft yellows, with a hint of neon blue in the glowing heart].\n",
+          "ScriptSegment": "remember that comparison is the thief of joy,",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "46",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing thoughtfully, chin slightly tilted up, looking towards a distant, glowing mountain peak] Set in [a whimsical, layered landscape representing the journey of self-improvement].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure stands on a path made of small, brightly colored stepping stones], midground – [a gently rolling hill dotted with blooming flowers, leading towards the mountain], background – [a majestic, softly glowing mountain peak, symbolizing achievement, bathed in a soft, pastel sunset].\nStick-figure posture: [thoughtful contemplation, gazing towards the distant goal].\nFacial expression: [calm determination, with a gentle, friendly smile].\nAccessory: [a small backpack overflowing with brightly colored, miniature motivational quotes].\nMotion cue: [none].\nEnvironment: [a peaceful, inspiring landscape conveying a sense of achievable progress and quiet strength].\nSymbolic object: [the glowing mountain peak represents the fulfillment of Roosevelt's wise words—a reachable goal despite the journey's challenges].\nColor palette: [muted neons—soft blues, pinks, and oranges blending into a calming pastel sunset].\n",
+          "ScriptSegment": "as Theodore Roosevelt wisely noted.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "47",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing slightly hunched, shoulders slightly slumped, but with a hopeful tilt of the head—posture suggesting a moment of quiet introspection]. Set in [a softly lit, pastel-colored room with a large, open window revealing a starry night sky].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients using muted neon pinks and blues.\nLayers: foreground – [the stick figure, slightly illuminated by a soft, glowing heart floating near their chest], midground – [a small, unlit, slightly dusty ladder leaning against a wall, partly obscured by the stick figure], background – [a starry night sky visible through a large window, suggesting vastness and possibility].\nStick-figure posture: [pensive, hopeful, and introspective—a slight hunch suggests carrying a weight, but the head tilt implies optimism].\nFacial expression: [gentle, friendly smile, dot eyes slightly downcast, but maintaining a hopeful, curious look—not sad or defeated].\nAccessory: [a small, glowing heart floating near the stick figure's chest, subtly pulsating with a soft light].\nMotion cue: [the glowing heart softly pulses with light].\nEnvironment: [a cozy, personal space suggesting introspection and self-discovery].\nSymbolic object: [the glowing heart representing an unmet need, the ladder representing the path to fulfilling that need, and the starry night sky representing limitless potential].\nColor palette: [muted neon pinks and blues, with soft whites and grays for the room, creating a calm and reflective atmosphere].\n",
+          "ScriptSegment": "Finally, realize that your fear might be masking a deeper, unmet need.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "48",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile, standing hesitantly at the edge of a brightly lit, sun-drenched meadow; posture conveys a mix of apprehension and curiosity] Set in [a symbolic landscape with a misty, shadowy forest representing the comfort zone in the background, a vibrant meadow representing the possibility of growth in the midground, and a single, gently glowing sun representing hope in the distance].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients, with brighter colors in the meadow and softer hues in the forest.\nLayers: foreground – [the stick figure, slightly transparent, as if they’re hesitant to fully step into the meadow], midground – [the meadow, filled with blooming flowers and gently swaying grass], background – [the dark, misty forest, with indistinct shapes suggesting hidden fears].\nStick-figure posture: [slightly hunched shoulders, one foot tentatively in the meadow, one foot still on the edge of the forest, head tilted slightly—shows reluctance but also a hint of hope].\nFacial expression: [a gentle, friendly smile, but with slightly narrowed eyes reflecting contemplation and apprehension].\nAccessory: [a small, glowing heart-shaped locket around the stick figure’s neck, representing vulnerability and inner strength].\nMotion cue: [the stick figure's weight is subtly shifted towards the meadow, suggesting a slow, thoughtful movement forward].\nEnvironment: [a contrast between a dark, mysterious forest representing the comfort zone and a bright, inviting meadow representing growth and facing fears].\nSymbolic object: [the glowing heart locket and the contrast between the forest and the meadow—the heart represents vulnerability while the meadow and forest represent different choices].\nColor palette: [muted neons for the meadow—light blues, pinks, and oranges—and moody, dark greens and purples for the forest, creating a sense of contrast and hope].\n",
+          "ScriptSegment": "Are you avoiding discomfort because you're afraid to feel vulnerable?",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "49",
+          "TTMPrompt": "TTM Prompt Format:\n\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing hesitantly at the edge of a brightly lit, inviting meadow, looking back at a cozy, but slightly cluttered and dimly lit room]. Set in [a symbolic split scene: a cozy, cluttered room representing the comfort zone in the background, a bright, open meadow representing potential success in the foreground].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [brightly lit meadow with wildflowers and a gently sloping path leading to a distant, indistinct mountain peak], midground – [the stick figure, slightly apprehensive, one foot in the room, one foot on the threshold], background – [a cozy but cluttered room, filled with blankets, pillows, books, and half-finished projects, dimly lit with warm-toned light].\nStick-figure posture: [slightly hesitant and turned, looking back at the room with a thoughtful expression].\nFacial expression: [a gentle, friendly smile, but with a hint of uncertainty in the dot eyes].\nAccessory: [a small, glowing backpack overflowing with slightly messy but colorful supplies, representing the potential and effort of achieving success].\nMotion cue: [slightly turned, one foot in the room, one foot toward the meadow, suggesting the contemplation of change].\nEnvironment: [a symbolic contrast between the comfort of the familiar and the potential of the unknown].\nSymbolic object: [the open meadow representing success, the cluttered room representing the comfort zone, the backpack symbolizing the necessary effort].\nColor palette: [muted neons for the meadow, cozy pastels for the room, with a moody contrast between the two].\n",
+          "ScriptSegment": "Or maybe, are you afraid of success because it would require a significant change in your current lifestyle?",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "50",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; sitting cross-legged, looking thoughtfully at a small, glowing mirror held in their hands, a peaceful, contemplative posture]. Set in [a softly lit, pastel-colored bedroom, with bookshelves overflowing with colorful books in the background and fairy lights strung around the room].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients using muted neons (blues and pinks).\nLayers: foreground – [the stick figure holding the glowing mirror], midground – [a small, cozy desk with a notebook and pencils], background – [the softly lit bedroom with bookshelves and fairy lights].\nStick-figure posture: [contemplative and peaceful].\nFacial expression: [thoughtful, yet calm and gentle smile].\nAccessory: [a small, glowing mirror reflecting a slightly brighter, more confident version of the stick figure].\nMotion cue: [none].\nEnvironment: [a calm, introspective bedroom space, suggesting personal reflection].\nSymbolic object: [a glowing mirror reflecting inner growth and self-discovery].\nColor palette: [muted neons—soft blues, pinks, and lavenders with touches of warm white].\n",
+          "ScriptSegment": "This self-reflection is crucial;",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "51",
+          "TTMPrompt": "TTM Prompt Format:\n\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing thoughtfully, holding a small, glowing heart in one hand and a magnifying glass in the other, examining the heart closely]. Set in [a softly lit, pastel-colored room with floating, translucent thought bubbles containing sketched-out faces expressing various emotions – fear, sadness, anger, etc.  These emotions are depicted simply and non-violently, only as facial expressions].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure holding the heart and magnifying glass], midground – [the floating thought bubbles], background – [a soft, pastel-colored wall with a ladder leading upwards, partially obscured by the thought bubbles].\nStick-figure posture: [thoughtful, slightly hunched over the glowing heart, conveying introspection].\nFacial expression: [gentle, curious, and slightly concerned, maintaining the dot eyes and friendly smile].\nAccessory: [a small, glowing heart representing core emotions and a magnifying glass symbolizing self-examination].\nMotion cue: [the stick figure is gently turning the glowing heart, examining it carefully with the magnifying glass].\nEnvironment: [a calm, introspective space, suggesting a safe place for self-reflection].\nSymbolic object: [the glowing heart represents core emotions, while the magnifying glass and thought bubbles represent self-examination and uncovering hidden emotional patterns].\nColor palette: [muted neons – blues, lavenders, and pinks – combined with cozy pastel yellows and creams].\n",
+          "ScriptSegment": "identify the core emotional issues fueling your self-sabotage to start addressing them proactively.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "52",
+          "TTMPrompt": "TTM Prompt:\n\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile, standing with arms raised in a triumphant yet relaxed pose, radiating confidence] Set in [a vibrant, dreamlike landscape composed of layered pastel clouds and glowing neons].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients, using a muted neon color palette.\nLayers: foreground – [the stick figure, sharply outlined against a soft, glowing cloud], midground – [pastel pink and blue clouds forming a pathway upwards, leading to a clear sky], background – [a hazy, optimistic purple and orange sky with soft light rays].\nStick-figure posture: [confident, hopeful, and empowered—arms raised slightly, suggesting a feeling of release].\nFacial expression: [a determined yet peaceful smile, eyes sparkling with hope].\nAccessory: [a small, glowing backpack filled with tiny, sparkling stars].\nMotion cue: [a gentle upward motion implied by the pose and the upward-leading cloud pathway].\nEnvironment: [a surreal, optimistic dreamscape representing overcoming obstacles].\nSymbolic object: [the glowing backpack filled with stars symbolizes the potential and inner strength the stick figure is carrying].\nColor palette: [a mix of muted neons (pink, blue, orange) and soft pastels (lavender, light blue) creating a hopeful and vibrant atmosphere].\n",
+          "ScriptSegment": "So, are you ready to break free from these hidden saboteurs?",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "53",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing tall, shoulders slightly back, radiating quiet confidence] Set in [a softly glowing, iridescent nebula-like space, with swirling pastel clouds forming a pathway].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients, with a luminous glow around the stick figure.\nLayers: foreground – [the stick figure, feet firmly planted on a small, cloud-like platform], midground – [the swirling pastel nebula, suggesting a journey or path], background – [a deeper, richer blue-purple space, speckled with tiny, glittering stars, hinting at limitless potential].\nStick-figure posture: [confident, yet humble, suggesting self-belief without arrogance].\nFacial expression: [a calm, gentle, and hopeful smile, eyes gazing towards the brighter parts of the nebula].\nAccessory: [a small, glowing backpack filled with tiny, brightly colored stars, symbolizing dreams and aspirations].\nMotion cue: [none; a still image conveying quiet strength and potential].\nEnvironment: [a dreamlike, aspirational landscape that feels both safe and exciting].\nSymbolic object: [the nebula pathway, representing the journey of self-discovery and the vast potential within].\nColor palette: [muted neons—soft pinks, blues, and purples—mixed with cozy pastels, creating a calming yet energetic atmosphere].\n",
+          "ScriptSegment": "You possess the potential;",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "54",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing tall, shoulders back, a confident but relaxed posture; holding a small, glowing sun in one hand] Set in [a dreamy, pastel-colored landscape with soft, rolling hills in the midground and a vibrant, starry sky in the background].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients in muted neons.\nLayers: foreground – [the stick figure, brightly lit, holding the glowing sun], midground – [soft, rolling pastel hills representing challenges overcome], background – [a vibrant, starry night sky symbolizing limitless potential].\nStick-figure posture: [confident and relaxed, conveying a sense of overcoming obstacles].\nFacial expression: [determined but peaceful smile, dot eyes sparkling with hope].\nAccessory: [a glowing sun, representing inner strength and self-belief].\nMotion cue: [none].\nEnvironment: [a peaceful and inspiring landscape representing the journey of self-discovery].\nSymbolic object: [the glowing sun, symbolizing the overcoming of fear, perfectionism, and self-doubt; the hills represent challenges overcome].\nColor palette: [a blend of pastel pinks, blues, and purples, accented with neon yellow from the sun].\n",
+          "ScriptSegment": "stop letting fear, perfectionism, and self-doubt dictate your journey.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "55",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing slightly tilted, gazing upward with a thoughtful expression, arms loosely at sides] Set in [a sun-dappled forest clearing with layers of overgrown foliage and a soft, ethereal glow].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients, using a muted neon palette with hints of pastel.\nLayers: foreground – [the stick figure, surrounded by small, glowing dandelion clocks softly floating around their feet], midground – [lush green ferns and wildflowers, gently swaying in a soft breeze], background – [tall, ancient trees with leaves dappled with sunlight, creating a hazy, dreamy atmosphere].\nStick-figure posture: [pensively observant, yet hopeful].\nFacial expression: [thoughtful contemplation, a hint of wonder in the dot eyes, and the signature gentle smile].\nAccessory: [a small, glowing compass held loosely in one hand, its needle subtly pointing upward].\nMotion cue: [dandelion clocks softly drifting around the stick figure].\nEnvironment: [a peaceful, optimistic forest clearing bathed in warm sunlight; suggesting a path forward is slowly revealed].\nSymbolic object: [glowing dandelion clocks, symbolizing opportunities and potential waiting to be discovered].\nColor palette: [muted neons—greens, yellows, and blues, with touches of soft peach and lavender pastels].\n",
+          "ScriptSegment": "The signs are there;",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "56",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing with arms outstretched slightly, palms up, in a receptive posture; conveying openness and acceptance] Set in [a sun-drenched meadow with tall grass in the foreground, a gently flowing river in the midground, and a pastel sunset sky in the background].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients of muted neons and pastels.\nLayers: foreground – tall blades of grass softly swaying in a breeze, with glowing, pastel-colored hearts floating amidst them; midground – a calm, clear river reflecting the sunset, small paper boats sailing gently on its surface; background – a pastel sunset sky with soft clouds.\nStick-figure posture: open and receptive, arms slightly outstretched in a gesture of acknowledgement.\nFacial expression: gentle, friendly smile with dot eyes conveying warmth and understanding.\nAccessory: a single, glowing heart gently floating near the stick figure's hand.\nMotion cue: gentle swaying of grass and floating hearts.\nEnvironment: peaceful and accepting meadow at sunset.\nSymbolic object: glowing hearts representing acknowledgement and acceptance of emotions or challenges.\nColor palette: muted neons (light pinks, blues, and yellows) blended with cozy pastels (cream, light green).\n",
+          "ScriptSegment": "acknowledge them,",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "57",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing tall and confidently facing forward, shoulders squared, a subtle tilt of the head suggesting approachable openness. Posture conveys self-assurance and readiness]. Set in [a sun-drenched meadow with gently rolling hills in the distance, overlaid with a soft, glowing nebula effect in the sky].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients, with a slight glow around the stick figure.\nLayers: foreground – [the stick figure, radiating a soft, golden light], midground – [the meadow, with tall grass rendered in soft, pastel greens and yellows], background – [the rolling hills and a nebula sky in muted neons of pink, purple, and blue].\nStick-figure posture: [confident, open, and approachable].\nFacial expression: [a gentle, encouraging smile, dot eyes looking directly at the viewer, conveying warmth and understanding].\nAccessory: [a small, glowing constellation of stars orbiting the stick figure's head, representing potential and inner light].\nMotion cue: [none, the image is a still moment of connection].\nEnvironment: [a peaceful, hopeful, and empowering meadow representing the potential for growth and overcoming challenges].\nSymbolic object: [the constellation of stars, symbolizing the audience that the stick figure is addressing].\nColor palette: [a blend of cozy pastels in the foreground (greens, yellows) transitioning to moody neons in the background (muted pinks, purples, blues), creating a calming yet energizing atmosphere].\n",
+          "ScriptSegment": "address them,",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "58",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing tall with arms raised in a small victory pose, radiating confidence] Set in [a vibrant, layered dreamscape].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure, glowing faintly with a soft, pastel-pink aura], midground – [a shimmering, translucent staircase ascending into a sky filled with pastel clouds], background – [a cityscape rendered in muted neons, suggesting a sense of accomplishment and progress].\nStick-figure posture: [confident and triumphant, but still relatable and approachable].\nFacial expression: [a small, proud smile, eyes sparkling with joy—but maintaining the consistent dot eyes and gentle smile].\nAccessory: [a small, glowing backpack overflowing with miniature, brightly colored stars].\nMotion cue: [a gentle upward motion blur around the stick figure, suggesting ascension].\nEnvironment: [a hopeful and inspiring dreamscape, suggesting limitless potential].\nSymbolic object: [the shimmering staircase representing the journey of self-improvement, leading to a brighter future].\nColor palette: [a blend of muted neons—like soft blues, pinks, and purples—with cozy pastel accents].\n",
+          "ScriptSegment": "and then level up.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "59",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile, standing patiently but determinedly on a small, slightly worn, wooden stepladder, looking upward with a hopeful expression] Set in [a softly lit attic space with sunbeams streaming through dusty windowpanes; the walls are lined with half-packed boxes, representing past challenges and stages of growth].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients in muted neons (blues, pinks, and oranges).\nLayers: foreground – [the stick figure on the stepladder, slightly in focus], midground – [a pile of half-packed boxes, slightly out of focus], background – [the dusty attic window letting in sunbeams, significantly out of focus].\nStick-figure posture: [determined yet calm; upward gaze suggesting ambition].\nFacial expression: [hopeful, patiently optimistic gentle smile].\nAccessory: [a small, glowing backpack representing resilience and the accumulation of experience].\nMotion cue: [the figure is stationary, but the upward gaze implies motion towards a goal].\nEnvironment: [a cozy, slightly cluttered attic, symbolizing the journey of self-improvement].\nSymbolic object: [the stepladder representing gradual, sustainable progress, not instant gratification].\nColor palette: [muted neons with warm pastel highlights, creating a cozy yet aspirational mood].\n",
+          "ScriptSegment": "This isn't about quick fixes;",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "60",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing firmly on a rocky outcrop, arms outstretched as if embracing a vast, calming landscape]. Set in [a sprawling, mountainous landscape with a vibrant sunset in the background; a gentle breeze rustles through the grass in the foreground].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients using muted neon pinks and blues.\nLayers: foreground – [wildflowers and tall grasses swaying gently in the breeze], midground – [the rocky outcrop where the stick figure stands], background – [a majestic mountain range silhouetted against a sunset with soft, pastel orange and purple hues].\nStick-figure posture: [confident and grounded, arms outstretched in a posture of embracing the challenge].\nFacial expression: [calm determination, dot eyes looking towards the sunset with a gentle, reassuring smile].\nAccessory: [a small, glowing backpack symbolizing the resilience gained through challenges].\nMotion cue: [the wildflowers and grasses gently swaying in the breeze].\nEnvironment: [a serene and inspiring mountain vista suggesting overcoming obstacles].\nSymbolic object: [the mountain range symbolizing the challenges overcome, and the sunset representing the calm after the storm; the glowing backpack represents the rewards and resilience built].\nColor palette: [muted neons—pink, orange, and purple at sunset; cool blues and greens in the foreground].\n",
+          "ScriptSegment": "it's about building lasting resilience,",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "61",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; standing thoughtfully, looking into a handheld mirror reflecting a vibrant, swirling galaxy]. Set in [a cozy, pastel-toned bedroom with string lights twinkling, a half-open book on the nightstand, and a plush carpet].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [the stick figure holding the mirror], midground – [the nightstand with the book and string lights], background – [the galaxy reflected in the mirror, subtly extending into the bedroom walls].\nStick-figure posture: [pensive, contemplative, yet hopeful].\nFacial expression: [gentle curiosity and a hint of self-discovery].\nAccessory: [a handheld mirror reflecting a vibrant, swirling galaxy].\nMotion cue: [none].\nEnvironment: [a personal, intimate space representing introspection].\nSymbolic object: [the mirror reflecting the galaxy, symbolizing the vast and unexplored landscape of the self].\nColor palette: [muted neons—soft pinks, blues, and purples, with hints of gold in the galaxy reflection].\n",
+          "ScriptSegment": "understanding your own psychology,",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "62",
+          "TTMPrompt": "A stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; confidently striding forward with a determined but relaxed posture, one foot slightly ahead of the other]. Set in [a vibrant, sun-drenched meadow with a gently winding path stretching towards a distant, softly glowing mountain peak].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients using muted neons.\nLayers: foreground – [the stick figure walking on a path sprinkled with small, glowing stars], midground – [the vibrant green meadow dotted with wildflowers], background – [the distant, softly glowing mountain peak bathed in a pastel sunset].\nStick-figure posture: [confident, determined, yet relaxed and approachable].\nFacial expression: [a gentle, determined smile; dot eyes looking forward with focus].\nAccessory: [a small backpack overflowing with colorful, neatly-organized mini-goals represented by small, brightly colored squares].\nMotion cue: [walking forward with a purposeful, yet light stride].\nEnvironment: [a peaceful and inspiring meadow symbolizing the journey towards goals].\nSymbolic object: [the glowing mountain peak represents the ultimate goal, approachable through consistent action].\nColor palette: [muted neons—coral, teal, and lavender—with accents of warm yellows and oranges in the sunset].\n",
+          "ScriptSegment": "and then taking consistent, deliberate action toward your goals.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      },
+      {
+        "json": {
+          "No": "63",
+          "TTMPrompt": "TTM Prompt Format:\nA stick figure [with short, tousled black hair, dot eyes, and a gentle, friendly smile; confidently striding forward with a determined but relaxed posture, arms slightly swinging]. Set in [a vibrant, sun-drenched meadow with a path winding towards a distant, glowing city on a hill].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients, with a brighter light source highlighting the path ahead.\nLayers: foreground – [the stick figure's feet and lower legs, partially obscuring the meadow grass], midground – [the meadow path, stretching towards the city, with wildflowers scattered along the sides], background – [the glowing city on the hill, its lights suggesting opportunity and progress].\nStick-figure posture: [confident and determined, but not aggressive or boastful; a feeling of calm resolve].\nFacial expression: [a determined yet peaceful smile; the dot eyes looking forward with hopeful anticipation].\nAccessory: [a small, glowing backpack representing potential and the journey ahead].\nMotion cue: [legs striding forward with a feeling of positive momentum—a slightly blurred effect on the lower legs to enhance the motion].\nEnvironment: [an optimistic and hopeful environment, suggesting the possibility of overcoming challenges].\nSymbolic object: [the glowing city on the hill—a representation of achieving goals and dreams].\nColor palette: [a blend of muted neons – light blues and pinks for the sky and flowers – with warm, cozy pastels for the meadow and path, creating a sense of optimistic energy].\n",
+          "ScriptSegment": "Now go make it happen.",
+          "Status": "Status",
+          "spreadsheetId": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "sheetId": 116001271,
+          "Judul": "Ditch the Hustle: Build Sustainable Vibes"
+        }
+      }
+    ]
+  },
+  "versionId": "b55ebb55-ec6a-4bb2-a0e7-e14188ecc2af",
+  "triggerCount": 0,
+  "tags": []
+}

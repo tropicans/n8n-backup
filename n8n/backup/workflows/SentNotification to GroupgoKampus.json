@@ -1,0 +1,466 @@
+{
+  "createdAt": "2025-07-02T04:10:22.157Z",
+  "updatedAt": "2025-07-02T09:00:23.887Z",
+  "id": "iK7Eoey3O3h1Ax7M",
+  "name": "SentNotification to GroupgoKampus",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1yZw_Bvs2wZxeHuMPTxZo67v-e7EqaQY8Nb1CkuuDuHo",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "1301873926",
+          "mode": "id"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -60,
+        -205
+      ],
+      "id": "6f2311b4-4e90-4d6d-8a79-4d4789fc4fd0",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EvJFGzn1Pb9TRY0E",
+          "name": "Google Sheets account Tropicans"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        160,
+        -205
+      ],
+      "id": "934fb8bc-43ba-46cf-b850-2ecf21b69f44",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "url": "https://api.fonnte.com/send",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "target",
+              "value": "120363408706329401@g.us"
+            },
+            {
+              "name": "message",
+              "value": "=Ada yang melaporkan kendala dan aduan dengan informasi sbb:\n\nNama: {{ $json['Nama Lengkap'] }}\nemail: {{ $json['Alamat Email'] }}\nHP: {{ $json['Nomor Selular'] }}\nUnit Kerja: {{ $json['Unit Kerja'] }}\nDeskripsi kendala: {{ $json['Deskripsi Kendala'] }}\nTangkapan layar: {{ $json['Tangkapan Layar (screenshoot)'] }}"
+            },
+            {
+              "name": "text",
+              "value": "text"
+            },
+            {
+              "name": "device",
+              "value": "6285147292770"
+            },
+            {
+              "name": "delay",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        600,
+        -280
+      ],
+      "id": "257402cc-c218-4605-90ed-f6b7f807a837",
+      "name": "HTTP Request2",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "TtjEcr7tGLqC4ivO",
+          "name": "Fonnte HaloGaharu"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "hours"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1260,
+        -205
+      ],
+      "id": "5fd8885f-0c38-40fa-a09d-f1725da4fd3a",
+      "name": "Wait",
+      "webhookId": "cd87caea-830e-4726-b90f-6a8dfdaa3a34"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1yZw_Bvs2wZxeHuMPTxZo67v-e7EqaQY8Nb1CkuuDuHo",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "1301873926",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nomor Selular": "={{ $('Loop Over Items').item.json[\"Nomor Selular\"] }}",
+            "Status": "Sent Notification To WA Group",
+            "Last Update": "={{(() => {   const now = new Date($now);   return now.toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }); })()}}"
+          },
+          "matchingColumns": [
+            "Nomor Selular"
+          ],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Nama Lengkap",
+              "displayName": "Nama Lengkap",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Alamat Email",
+              "displayName": "Alamat Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "NIP",
+              "displayName": "NIP",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Nomor Selular",
+              "displayName": "Nomor Selular",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Deskripsi Kendala",
+              "displayName": "Deskripsi Kendala",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Tangkapan Layar (screenshoot)",
+              "displayName": "Tangkapan Layar (screenshoot)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Unit Kerja",
+              "displayName": "Unit Kerja",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last Update",
+              "displayName": "Last Update",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Progress",
+              "displayName": "Progress",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1040,
+        -280
+      ],
+      "id": "dac85786-aac2-459f-bc0d-534f0f18d8fd",
+      "name": "Google Sheets Update",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EvJFGzn1Pb9TRY0E",
+          "name": "Google Sheets account Tropicans"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7ebcde86-0c2b-4968-9048-d0734dd45ff4",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        380,
+        -280
+      ],
+      "id": "bed39da5-294f-47d8-9e62-9fe09ac2207c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "70a50ad7-4e8d-40e7-b3b8-a8fbefc31b94",
+              "leftValue": "={{ $json.process }}",
+              "rightValue": "pending",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        820,
+        -280
+      ],
+      "id": "cc3f9b88-ccb9-4892-9c36-2f154c60d6f6",
+      "name": "If1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        -205
+      ],
+      "id": "95e92851-94cb-4e62-a6f5-d3dc6b1a1ba9",
+      "name": "When clicking ‘Execute workflow’"
+    }
+  ],
+  "connections": {
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets Update": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "2b2b7c52-d940-4851-a15f-020a939cf6b5",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "createdAt": "2025-07-02T03:05:48.288Z",
+      "updatedAt": "2025-07-02T03:05:48.288Z",
+      "id": "g68CGNOVFhN6AiuY",
+      "name": "WhatsApp"
+    }
+  ]
+}

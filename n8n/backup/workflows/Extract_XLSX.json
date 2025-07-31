@@ -1,0 +1,134 @@
+{
+  "createdAt": "2025-06-02T07:43:05.154Z",
+  "updatedAt": "2025-07-02T03:10:16.730Z",
+  "id": "uSMQA9FUFZx81ta1",
+  "name": "Extract_XLSX",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "067db1f9-fa9b-4802-9819-152c341eee2d",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "sheetName": "Sheet1"
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        560,
+        0
+      ],
+      "id": "eaec1c19-6dac-4850-a509-2b65fbab2be1",
+      "name": "Extract from File",
+      "alwaysOutputData": true,
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "command": "base64 -w0 /data/shared/data/datamakanan.xlsx"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        180,
+        0
+      ],
+      "id": "b2d1ef91-0375-4195-a43a-a3f841e4595f",
+      "name": "Execute Command",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. ambil base64 dari stdout\nconst b64 = items[0].json.stdout;\n\n// 2. decode ke Buffer\nconst buf = Buffer.from(b64, 'base64');\n\n// 3. ubah Buffer jadi binary yang dimengerti n8n\nconst binaryData = await this.helpers.prepareBinaryData(buf, 'datamakanan.xlsx');\n\n// 4. return item dengan binary.data\nreturn [\n  {\n    json: {},             // kosongkan JSON jika cuma butuh binary\n    binary: {\n      data: binaryData,   // nama field “data”\n    },\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        360,
+        0
+      ],
+      "id": "66e512a5-50e5-4bf1-b25d-a7616a2d274a",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        780,
+        0
+      ],
+      "id": "35a49707-3be5-48a0-9618-e3031738ebc0",
+      "name": "Loop Over Items"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "07d61a2c-4aff-482d-bd99-84947512be11",
+  "triggerCount": 0,
+  "tags": []
+}
