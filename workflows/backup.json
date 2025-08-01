@@ -1,0 +1,211 @@
+{
+  "name": "Backup n8n Workflows & Credentials ke GitHub",
+  "nodes": [
+    {
+      "parameters": {
+        "command": "n8n export:workflow --all --separate --output=/backup/workflows\nn8n export:credentials --all --separate --output=/backup/credentials"
+      },
+      "id": "execute-command",
+      "name": "Export Workflows & Credentials",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [500, 200]
+    },
+    {
+      "parameters": {
+        "directoryPath": "/backup/workflows"
+      },
+      "id": "read-workflows",
+      "name": "Read Workflows",
+      "type": "n8n-nodes-base.readBinaryFiles",
+      "typeVersion": 1,
+      "position": [700, 100]
+    },
+    {
+      "parameters": {
+        "directoryPath": "/backup/credentials"
+      },
+      "id": "read-credentials",
+      "name": "Read Credentials",
+      "type": "n8n-nodes-base.readBinaryFiles",
+      "typeVersion": 1,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "batchSize": 1
+      },
+      "id": "split-batch-workflows",
+      "name": "SplitInBatches Workflows",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [900, 100]
+    },
+    {
+      "parameters": {
+        "batchSize": 1
+      },
+      "id": "split-batch-credentials",
+      "name": "SplitInBatches Credentials",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "fields": {
+          "fileName": "={{$json[\"fileName\"]}}",
+          "content": "={{$binary.data.data}}"
+        }
+      },
+      "id": "set-workflow",
+      "name": "Set Workflow File",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [1100, 100]
+    },
+    {
+      "parameters": {
+        "fields": {
+          "fileName": "={{$json[\"fileName\"]}}",
+          "content": "={{$binary.data.data}}"
+        }
+      },
+      "id": "set-credentials",
+      "name": "Set Credential File",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [1100, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "url": "https://api.github.com/repos/tropicans/n8n-backup/contents/backup/workflows/{{$json.fileName}}",
+        "options": {},
+        "allowUnauthorizedCerts": false,
+        "method": "PUT",
+        "responseFormat": "json",
+        "bodyParametersJson": "{\"message\": \"Backup workflow {{$json.fileName}} {{ $now }}\",\"content\": \"={{$json.content}}\",\"branch\": \"main\"}",
+        "headerParametersJson": "{\"Accept\": \"application/vnd.github+json\"}"
+      },
+      "id": "http-upload-workflow",
+      "name": "Upload Workflow to GitHub",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [1300, 100],
+      "credentials": {
+        "httpRequestOAuth2Api": {
+          "id": "YOUR_GITHUB_BEARER_CREDENTIAL_ID",
+          "name": "GitHub Bearer"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "url": "https://api.github.com/repos/tropicans/n8n-backup/contents/backup/credentials/{{$json.fileName}}",
+        "options": {},
+        "allowUnauthorizedCerts": false,
+        "method": "PUT",
+        "responseFormat": "json",
+        "bodyParametersJson": "{\"message\": \"Backup credentials {{$json.fileName}} {{ $now }}\",\"content\": \"={{$json.content}}\",\"branch\": \"main\"}",
+        "headerParametersJson": "{\"Accept\": \"application/vnd.github+json\"}"
+      },
+      "id": "http-upload-credentials",
+      "name": "Upload Credentials to GitHub",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [1300, 300],
+      "credentials": {
+        "httpRequestOAuth2Api": {
+          "id": "YOUR_GITHUB_BEARER_CREDENTIAL_ID",
+          "name": "GitHub Bearer"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Export Workflows & Credentials": {
+      "main": [
+        [
+          {
+            "node": "Read Workflows",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Read Credentials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Workflows": {
+      "main": [
+        [
+          {
+            "node": "SplitInBatches Workflows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Credentials": {
+      "main": [
+        [
+          {
+            "node": "SplitInBatches Credentials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SplitInBatches Workflows": {
+      "main": [
+        [
+          {
+            "node": "Set Workflow File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Workflow File": {
+      "main": [
+        [
+          {
+            "node": "Upload Workflow to GitHub",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SplitInBatches Credentials": {
+      "main": [
+        [
+          {
+            "node": "Set Credential File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Credential File": {
+      "main": [
+        [
+          {
+            "node": "Upload Credentials to GitHub",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
