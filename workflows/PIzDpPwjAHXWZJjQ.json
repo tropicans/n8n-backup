@@ -1,0 +1,263 @@
+{
+  "active": false,
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-06-14T02:24:45.414Z",
+  "id": "PIzDpPwjAHXWZJjQ",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "IDE_Auto_Video_selfSabotage",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Act as a content strategist for a YouTube channel focused on self-motivation for Gen Z. Create 20 click-worthy video titles in English that are:\n\n• ≤10 words each\n• Casual Gen Z lingo mixed with self-growth/motivation context (e.g. “lowkey,” “vibes,” “hack,” “real talk”)\n• Second-person perspective (“you,” “your,” “we”)\n• Packed with curiosity or urgency (“secret,” “warning,” “reasons why,” “signs,” “struggle,” “big,” “wrong”)\n• Subtly rooted in psychological or motivational science framing\n• Inspired by these models:\n– 5 Ways To Make Your Motivation Actually Last\n– Why Gen Z Gets Burned Out—And How to Bounce Back\n– 5 Productivity Struggles in the Digital Age (and How To Win)\n– Productive Lifestyle on a Budget: Simple Anti-Procrastination Tips\n– Signs You Need a “Social Media Detox” To Stay Sane\n\nOutput:\n\n1. …\n2. …\n…\n\n20. …\n\n\nProvide only the list—no intro or outro.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -100,
+        -120
+      ],
+      "id": "e653a858-5f42-4ee2-958a-4edb2542d180",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ambil output string\nconst output = $json.output;\n\n// Split berdasarkan newline (\\n)\nconst splitted = output.split('\\n');\n\n// Proses array: Trim, Filter kosong, Pisahkan Nomor dan Judul\nconst processed = splitted\n  .map(item => item.trim())         // Hilangkan spasi\n  .filter(item => item.length > 0)  // Hanya item tidak kosong\n  .map(item => {\n    // Pisahkan berdasarkan \". \" (angka diikuti titik dan spasi)\n    const match = item.match(/^(\\d+)\\.\\s*(.*)$/);\n\n    if (match) {\n      return {\n        json: {\n          number: parseInt(match[1], 10), // Nomor (angka)\n          title: match[2]                 // Judul\n        }\n      };\n    } else {\n      return {\n        json: {\n          number: null,\n          title: item\n        }\n      };\n    }\n  });\n\nreturn processed;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        280,
+        -120
+      ],
+      "id": "c5bca847-c83a-4b85-9ea6-c357a646d67e",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "mode": "list",
+          "cachedResultName": "AutoVideon8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1439856214,
+          "mode": "list",
+          "cachedResultName": "RAW",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY/edit#gid=1439856214"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "No": "={{ $json.number }}",
+            "Judul": "={{ $json.title }}"
+          },
+          "matchingColumns": [
+            "No"
+          ],
+          "schema": [
+            {
+              "id": "No",
+              "displayName": "No",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Judul",
+              "displayName": "Judul",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Script",
+              "displayName": "Script",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Hashtags",
+              "displayName": "Hashtags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Keywords",
+              "displayName": "Keywords",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Thumbnail Text",
+              "displayName": "Thumbnail Text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        500,
+        -120
+      ],
+      "id": "f057e17d-7e8e-47bb-b660-2c2e72253adf",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EvJFGzn1Pb9TRY0E",
+          "name": "Google Sheets account Tropicans"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -120
+      ],
+      "id": "e24f7a5e-ebb7-4412-b42a-e8d8071aa801",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        100
+      ],
+      "id": "875d32c9-8b3f-4fb1-85af-a97bb98d4f26",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "zpk4zLtRgRK5YOpA",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-07-02T03:07:28.648Z",
+  "versionId": "118ede56-e757-462d-b3f2-3f0592c0d7a4"
+}
