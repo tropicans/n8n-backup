@@ -1,0 +1,1012 @@
+{
+  "active": false,
+  "connections": {
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "CreateSheetbyNo",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Parse TTM Markdown Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse TTM Markdown Table": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CreateSheetbyNo": {
+      "main": [
+        [
+          {
+            "node": "Set Header1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "CleanTextOutput",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CreateHeader": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "AppendTTIPrompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AppendTTIPrompt": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execute Workflow1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execute Workflow2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CleanTextOutput": {
+      "main": [
+        [
+          {
+            "node": "SwitchingTheOutput",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SwitchingTheOutput": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets Add Script",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets Add Script": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IMGPromptGeneration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IMGPromptGeneration": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Header1": {
+      "main": [
+        [
+          {
+            "node": "CreateHeader",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow2": {
+      "main": [
+        []
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "IMGPromptGeneration",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-06-02T07:41:52.153Z",
+  "id": "OZQTQ5GTmsuxV8nD",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Auto_Video_selfSabotage",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "mode": "list",
+          "cachedResultName": "AutoVideon8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1439856214,
+          "mode": "list",
+          "cachedResultName": "RAW",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY/edit#gid=1439856214"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "To Do"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -660,
+        1930
+      ],
+      "id": "691bc1f9-4476-4dcc-b62c-67f2a08a4c7b",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EvJFGzn1Pb9TRY0E",
+          "name": "Google Sheets account Tropicans"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a skilled content segmenter for video narration scripts. Your task is to break down a narration script into the smallest meaningful spoken-level segments, with each segment being one clear sentence, idea, or emotion. Shorter is better.\n\nInstructions:\n- **Do NOT paraphrase, summarize, or merge lines. Each Script Segment must use the EXACT, ORIGINAL sentence or fragment from the narration, word-for-word.**\n- **No segment should be longer than one sentence.** If a sentence is long or contains multiple ideas, split it into multiple segments.\n- Whenever there is any shift in emotion, metaphor, tone, or message, start a new segment.\n- Do not leave out or skip any part of the script.  \n- If in doubt, make the segment shorter. Err on the side of over-segmentation.\n- Number each segment sequentially.\n\nOutput format:\n| No | Script Segment |\n|----|---------------|\n| 1  | [First segment] |\n| 2  | [Second segment] |\n|... | ... |\n\nScript to segment:\n\"{{ $json.Script }}\"",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        596,
+        1630
+      ],
+      "id": "36446da5-8185-43ed-b761-ec144cf684d8",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $json.output; // Markdown string\n\n// Temukan baris table yang valid\nconst lines = raw\n  .split('\\n')\n  .filter(line => /^\\|\\s*\\d+\\s*\\|/.test(line)); // Hanya baris isi, bukan header\n\nconst result = lines.map(line => {\n  // Split ke kolom, hapus spasi/strip di ujung\n  const cols = line.split('|').map(s => s.trim());\n  return {\n    No: cols[1],\n    ScriptSegment: cols[2]\n  };\n});\n\nreturn result.map(row => ({ json: row }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        972,
+        1630
+      ],
+      "id": "ecdea79d-a7f9-48d9-8ff2-352566617ee4",
+      "name": "Parse TTM Markdown Table"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3f1ad2cc-97b6-4464-8582-27c9e1b3de66",
+              "name": "No",
+              "value": "={{ $('Parse TTM Markdown Table').item.json.No }}",
+              "type": "string"
+            },
+            {
+              "id": "fb92cc1e-6c1f-4ae5-b166-32c81ad8b2fe",
+              "name": "TTMPrompt",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "c57e976f-d9a5-41d0-a143-a3ef283880df",
+              "name": "ScriptSegment",
+              "value": "={{ $('Parse TTM Markdown Table').item.json.ScriptSegment }}",
+              "type": "string"
+            },
+            {
+              "id": "8c48c8bd-e3e2-41c8-8333-79ab9fbbaa33",
+              "name": "Number",
+              "value": "={{ $('Google Sheets1').first().json.No }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1490,
+        1480
+      ],
+      "id": "4c7b14a0-ad7c-4f7b-8170-7a866a4c17d3",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $json.sheetId }}",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "No",
+              "displayName": "No",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ImagePrompt",
+              "displayName": "ImagePrompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ScriptSegment",
+              "displayName": "ScriptSegment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Alamat Embed",
+              "displayName": "Alamat Embed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "spreadsheetId",
+              "displayName": "spreadsheetId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sheetId",
+              "displayName": "sheetId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Judul",
+              "displayName": "Judul",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1490,
+        2080
+      ],
+      "id": "9b88bea0-6add-4c6f-b9db-986db49ac7e2",
+      "name": "CreateHeader",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EvJFGzn1Pb9TRY0E",
+          "name": "Google Sheets account Tropicans"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "documentId": {
+          "__rl": true,
+          "value": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "mode": "list",
+          "cachedResultName": "AutoVideon8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY/edit?usp=drivesdk"
+        },
+        "title": "=ide{{ $json.No }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        972,
+        2080
+      ],
+      "id": "22a185df-1f5c-4a8a-a778-f83a44d1cdaf",
+      "name": "CreateSheetbyNo",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EvJFGzn1Pb9TRY0E",
+          "name": "Google Sheets account Tropicans"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Act as a self-motivation content creator for Gen Z who produces direct, compelling YouTube scripts on topics like:\n• 5 Hidden Reasons Why Ambitious Gen Z Secretly Self-Sabotage\n• If You’re About to Level Up, You’ll Notice These Shocking Signs\n\nCreate a single, continuous narration (no separate sections or typical intros) on the topic: {{ $json.Title }}.\n\nRequirements:\n\n• Single Paragraph Format: Write everything as one continuous block of text.\n• Immediate Engagement: Start with a bold, direct statement or question—no phrases like “Today, we’ll discuss…” or “In this video…”\n• Word Count: 600–900 words total.\n• Tone & Content:\n • Use second-person perspective (“you”) for directness and urgency.\n • Incorporate references to psychological research, motivational science, or famous motivational quotes to support key insights—mention sources briefly, like “as Angela Duckworth’s research on grit shows,” but do not pause to explain.\n • Maintain a sense of intrigue, using words like “secretly,” “shocking,” “hidden,” “warning,” or “mistake” where fitting.\n • Avoid fluff or disclaimers; each sentence must add value or provoke curiosity.\n\n• Structure & Flow:\n • Present 3–5 key insights, but do so fluidly in a single paragraph.\n • Weave brief references to scientific findings or notable quotes naturally into the narration without breaking the flow.\n • End with a decisive conclusion or challenge—avoid typical YouTube closings like “subscribe for more.”\n\nWrite this narration now, following all points exactly, ensuring it reads as one continuous piece without typical transitions or introductions. Script should be written in English.\n\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -440,
+        1630
+      ],
+      "id": "f42fd903-2e0e-46f6-9627-f3281fd1d260",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1788,
+        1780
+      ],
+      "id": "e9d01b4a-5d59-4a27-9424-aad65f5029ae",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const header = $node[\"CreateHeader\"].json;\n\n// Only process items except the last one\nreturn items.slice(0, -1).map(item => {\n  return {\n    json: {\n      No: item.json.No,\n      TTMPrompt: item.json.TTMPrompt,\n      ScriptSegment: item.json.ScriptSegment,\n      Status: header.Status,\n      spreadsheetId: header.spreadsheetId,\n      sheetId: header.sheetId,\n      Judul: header.Judul\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2008,
+        1780
+      ],
+      "id": "316555a5-2c86-417d-b068-04541bca2019",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $json.sheetId }}",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "No",
+              "displayName": "No",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "TTMPrompt",
+              "displayName": "TTMPrompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ScriptSegment",
+              "displayName": "ScriptSegment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "spreadsheetId",
+              "displayName": "spreadsheetId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sheetId",
+              "displayName": "sheetId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Judul",
+              "displayName": "Judul",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        2228,
+        1780
+      ],
+      "id": "ad7a40eb-f884-4928-9951-14eeafa55e32",
+      "name": "AppendTTIPrompt",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EvJFGzn1Pb9TRY0E",
+          "name": "Google Sheets account Tropicans"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "mhr8WDItF3bUvYru",
+          "mode": "list",
+          "cachedResultName": "GeneratePIC"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2448,
+        1580
+      ],
+      "id": "8afbbb15-2495-4b8a-8e98-5e33ee7580e0",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "u656DlfMsKkrLzTS",
+          "mode": "list",
+          "cachedResultName": "AddSpeech"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2448,
+        1780
+      ],
+      "id": "8fa2b1b3-7302-4c3c-adfc-9464f1930982",
+      "name": "Execute Workflow1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const text = item.json.output || ''; // Updated key to match input\n  const cleaned = text\n    .replace(/[“”]/g, '\"')        // Smart quotes to normal quotes\n    .replace(/[‘’]/g, \"'\")        // Smart apostrophes\n    .replace(/[–—]/g, '-')        // En dash & em dash to hyphen\n    .replace(/\\u00A0/g, ' ')      // Non-breaking space to space\n    .replace(/\\*/g, '')           // Remove asterisks (*)\n    .replace(/[^\\x00-\\x7F]/g, '') // Remove other non-ASCII if needed\n    .replace(/^\"(.+)\"$/, '$1');   // Hapus \" di awal & akhir string\n\n  return { json: { ...item.json, cleanedText: cleaned } };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -64,
+        1630
+      ],
+      "id": "2e514017-feb7-469a-90d8-7bd676663f4e",
+      "name": "CleanTextOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f8307c7a-f670-459f-a51c-4b6cb27793a2",
+              "name": "",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "76bb1976-28eb-4630-8c9e-901fb5069ed3",
+              "name": "output",
+              "value": "={{ $json.cleanedText }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        156,
+        1630
+      ],
+      "id": "70890b53-c6d7-4512-9b76-d9d99e1dfe34",
+      "name": "SwitchingTheOutput"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY",
+          "mode": "list",
+          "cachedResultName": "AutoVideon8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1439856214,
+          "mode": "list",
+          "cachedResultName": "RAW",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1d2Gmh2zMJDr7V-1msM_iJAcswNlglrJDxLiXJAW6tUY/edit#gid=1439856214"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "No": "={{ $('Google Sheets1').item.json.No }}",
+            "Script": "={{ $json.output }}",
+            "Status": "Script Done"
+          },
+          "matchingColumns": [
+            "No"
+          ],
+          "schema": [
+            {
+              "id": "No",
+              "displayName": "No",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Judul",
+              "displayName": "Judul",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Script",
+              "displayName": "Script",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        376,
+        1630
+      ],
+      "id": "6097ac6b-b573-439d-978e-54e29dac3724",
+      "name": "Google Sheets Add Script",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EvJFGzn1Pb9TRY0E",
+          "name": "Google Sheets account Tropicans"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "imqQYaByVWRQfGTS",
+          "mode": "list",
+          "cachedResultName": "Gabungvideo"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2448,
+        1980
+      ],
+      "id": "6de7c948-901e-477d-a42c-426aed05abd4",
+      "name": "Execute Workflow2"
+    },
+    {
+      "parameters": {
+        "batchSize": 20,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1192,
+        1630
+      ],
+      "id": "006789e4-6c6a-4a88-a949-70fef8168025",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an advanced image prompt generator for a YouTube channel focused on self-motivation for Gen Z.\n\nCreate a richly descriptive image prompt for the following narration segment, using the exact visual style and symbolism described below.\n\nNarration Segment:\n\"{{ $json.ScriptSegment }}\"\n\n🎨 TTM Prompt Format:\nA stick figure [with short, tousled hair, dot eyes, and a gentle, friendly smile—posture, emotion, or action as described below; ensure posture and actions are always wholesome, safe, and fully clothed. The stick figure’s appearance (hair, eyes, face, smile) should be visually consistent in every scene, never exaggerated or cartoonish]. Set in [symbolic setting with layers and mood].\nStyle: doodle cartoon with textured brush outlines.\nShading & Gradients: soft shading and gentle gradients.\nLayers: foreground – [describe], midground – [describe], background – [describe].\nStick-figure posture: [emotionally expressive, but always appropriate and non-suggestive].\nFacial expression: [specific, non-provocative emotion—keep dot eyes and a gentle, relatable smile for consistency].\nAccessory: [metaphorical accessory related to motivation or struggle—avoid anything that could be interpreted as inappropriate].\nMotion cue: [if relevant, but always safe and non-violent].\nEnvironment: [emotional, motivational, or psychological setting].\nSymbolic object: [core metaphor].\nColor palette: [Gen Z aesthetic—muted neons, cozy pastels, or moody contrasts].\n\nCharacter Consistency Anchor:\nThe stick figure must always appear with: short, tousled black hair, dot eyes, a gentle friendly smile, and a simple, neutral, relatable face—maintain this look across every illustration, regardless of posture or emotion.\n\nImportant content safety instructions:\n\nAll visuals must be safe for work, cartoonish, wholesome, and family-friendly.\n\nNo nudity, suggestive poses, violence, adult content, or explicit themes—everything must be fully clothed and non-provocative.\n\nIf using objects or metaphors (like chains, masks, mirrors), always depict them in a clearly non-violent, non-suggestive, and motivational way. Avoid any context or visual that could trigger NSFW or safety filters.\n\nInstructions:\n\nMake the image prompt unique and emotionally resonant for Gen Z, reflecting the exact narration.\n\nUse emotionally rich metaphors and symbolic objects (e.g. glowing hearts, chains, ladders, mirrors, clouds, sneakers, etc.), always keeping content wholesome and positive.\n\nDo NOT paraphrase or reinterpret the narration segment—focus on converting the meaning and feeling into a symbolic visual scene.\n\nOutput only the TTM Prompt for this segment.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1412,
+        1680
+      ],
+      "id": "7d4d8493-a667-405f-b208-1ed58d8b69b5",
+      "name": "IMGPromptGeneration"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    'No': 'No',\n    'TTMPrompt': 'TTMPrompt',\n    'ScriptSegment': 'ScriptSegment',\n    'Status': 'Status',\n    'spreadsheetId': $('CreateSheetbyNo').item.json.spreadsheetId,\n    'sheetId': $('CreateSheetbyNo').item.json.sheetId,\n    'Judul': $('Google Sheets1').first().json.Judul\n  }\n}];"
+      },
+      "id": "2003c3e5-3dbb-44f6-aa3f-b26138aeae10",
+      "name": "Set Header1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        1192,
+        2080
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -880,
+        1930
+      ],
+      "id": "cca5076f-5c4c-4c5b-8930-148966d32b5c",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "model": "llama3:8b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        1900
+      ],
+      "id": "3535dae0-fc46-4286-a4ac-24421fe5bbdf",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "er9UBfBKoRVqOkGC",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama3:8b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        684,
+        1850
+      ],
+      "id": "e6218810-1654-476e-adc1-dc51265f1a43",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "er9UBfBKoRVqOkGC",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama3:8b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        1850
+      ],
+      "id": "3d14ff6c-b20b-43b2-9129-049a4c8c63a9",
+      "name": "Ollama Chat Model2",
+      "credentials": {
+        "ollamaApi": {
+          "id": "er9UBfBKoRVqOkGC",
+          "name": "Ollama account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2025-07-02T03:07:26.604Z",
+  "versionId": "5c7b75b6-4cf5-49b6-9fe9-603edc74ae6c"
+}
