@@ -125,7 +125,18 @@
         ]
       ]
     },
-    "Ollama Model": {
+    "Random Color": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
       "ai_languageModel": [
         [
           {
@@ -136,17 +147,6 @@
           {
             "node": "Structured Output Parser",
             "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Random Color": {
-      "main": [
-        [
-          {
-            "node": "Update a row",
-            "type": "main",
             "index": 0
           }
         ]
@@ -179,8 +179,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        200,
-        380
+        208,
+        384
       ],
       "id": "f74c9891-5e7d-47f3-9709-6b59a8949c00",
       "name": "Webhook",
@@ -208,8 +208,8 @@
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.6,
       "position": [
-        1540,
-        380
+        1552,
+        384
       ],
       "id": "06c0b49d-8c3b-472d-bd3d-7aa79bffab6e",
       "name": "Generate Title & Description"
@@ -222,8 +222,8 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.2,
       "position": [
-        1680,
-        560
+        1644,
+        608
       ],
       "id": "69038609-bdec-4944-ad0a-f4e712bacd51",
       "name": "Structured Output Parser"
@@ -264,8 +264,8 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.2,
       "position": [
-        1100,
-        580
+        1328,
+        576
       ],
       "id": "06cbb8c2-27e2-4964-8122-9a1edc74071f",
       "name": "Extract Text"
@@ -308,8 +308,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        440,
-        380
+        432,
+        384
       ],
       "id": "116d7156-59d9-4e72-b1f0-cd0fd096dd64",
       "name": "If"
@@ -342,8 +342,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        660,
-        280
+        656,
+        288
       ],
       "id": "caf089ae-8437-4f24-8cee-3098a9720da5",
       "name": "If1"
@@ -365,8 +365,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1100,
-        180
+        1328,
+        192
       ],
       "id": "225cf365-da69-43d3-836e-b10152a5c8a6",
       "name": "Set Text"
@@ -388,8 +388,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1240,
-        380
+        1328,
+        384
       ],
       "id": "59032e7f-358e-40d5-b0a6-3baa9df77fb3",
       "name": "Set Text1"
@@ -412,7 +412,7 @@
       "typeVersion": 4.2,
       "position": [
         880,
-        380
+        384
       ],
       "id": "51daa67e-d49f-4fee-92e4-09770e3eb13d",
       "name": "Fetch Webpage"
@@ -425,33 +425,11 @@
       "type": "n8n-nodes-base.markdown",
       "typeVersion": 1,
       "position": [
-        1060,
-        380
+        1104,
+        384
       ],
       "id": "05ea964d-adf0-4e42-83b4-a2ee6140c8b8",
       "name": "Markdown"
-    },
-    {
-      "parameters": {
-        "model": "qwen3:8b-q4_K_M",
-        "options": {
-          "format": "json"
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmOllama",
-      "typeVersion": 1,
-      "position": [
-        1520,
-        760
-      ],
-      "id": "14bc8c90-1946-4924-a766-ac013e7a368d",
-      "name": "Ollama Model",
-      "credentials": {
-        "ollamaApi": {
-          "id": "er9UBfBKoRVqOkGC",
-          "name": "Ollama account"
-        }
-      }
     },
     {
       "parameters": {
@@ -460,8 +438,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1960,
-        380
+        2044,
+        384
       ],
       "id": "27ce50e5-b997-4d8f-89bd-1ca35c13d64f",
       "name": "Random Color"
@@ -511,14 +489,14 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        2180,
-        380
+        2268,
+        384
       ],
       "id": "7a744622-d26b-4070-8382-8d10a831a6d0",
       "name": "Update a row",
       "credentials": {
         "supabaseApi": {
-          "id": "FLQTzRBk2pJi894u",
+          "id": "VputCyUE7lFqpFDA",
           "name": "Supabase account"
         }
       }
@@ -533,11 +511,31 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        200,
-        -40
+        208,
+        -48
       ],
       "id": "b02bcaac-9521-44f7-8a1c-c26532a1f3b7",
       "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1648,
+        816
+      ],
+      "id": "2cd3c26e-f450-48ff-a0c4-e473d87c3ee9",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "JUjXarPUY9EoEB7c",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -554,6 +552,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2025-07-31T04:43:20.256Z",
-  "versionId": "944d943e-77c8-4100-aa6e-15d9e290b474"
+  "updatedAt": "2025-08-04T02:39:26.265Z",
+  "versionId": "5053112a-3713-4208-b9ea-bcd9213b20ed"
 }
