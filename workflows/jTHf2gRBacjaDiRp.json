@@ -133,7 +133,7 @@
         ]
       ]
     },
-    "Ollama Model": {
+    "Google Gemini Chat Model": {
       "ai_languageModel": [
         [
           {
@@ -149,7 +149,7 @@
         ]
       ]
     },
-    "Embeddings Ollama": {
+    "Embeddings Google Gemini": {
       "ai_embedding": [
         [
           {
@@ -165,7 +165,8 @@
   "id": "jTHf2gRBacjaDiRp",
   "isArchived": false,
   "meta": {
-    "instanceId": "4f600cb49d3121f65c18400af1d03491e3934ff3323ac0ca2427a7ded76555c6"
+    "instanceId": "4f600cb49d3121f65c18400af1d03491e3934ff3323ac0ca2427a7ded76555c6",
+    "templateCredsSetupCompleted": true
   },
   "name": "InsightsLM - Upsert to Vector Store",
   "nodes": [
@@ -179,7 +180,7 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -420,
+        -416,
         320
       ],
       "id": "c2a3a825-17c2-41bf-9d49-0a13b3bfd4c9",
@@ -206,7 +207,7 @@
       "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
       "typeVersion": 1.1,
       "position": [
-        1080,
+        1088,
         320
       ],
       "id": "22d13ff3-571f-402d-a8e7-2d63bf847dac",
@@ -242,7 +243,7 @@
       "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
       "typeVersion": 1,
       "position": [
-        1180,
+        1184,
         560
       ],
       "id": "69978214-5281-4703-beba-c9ac5a4c97c6",
@@ -257,7 +258,7 @@
       "typeVersion": 1,
       "position": [
         1280,
-        740
+        752
       ],
       "id": "3b6c2ac7-8d4d-4ea1-9940-73cc688285be",
       "name": "Recursive Character Text Splitter"
@@ -279,7 +280,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        840,
+        848,
         320
       ],
       "id": "e86b3bed-bdfe-4012-aa5a-f4be3020b4a8",
@@ -292,7 +293,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        20,
+        32,
         320
       ],
       "id": "83f3cd6f-021e-4436-a783-1f577bc5e964",
@@ -358,8 +359,8 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.2,
       "position": [
-        380,
-        520
+        384,
+        528
       ],
       "id": "a1de9b05-9c4e-42c3-bb9a-4b8d774472ba",
       "name": "Structured Output Parser"
@@ -397,7 +398,7 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        620,
+        624,
         320
       ],
       "id": "69901bf9-75b5-4f3d-aab3-69aaa9ea7c15",
@@ -445,7 +446,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.2,
       "position": [
-        -200,
+        -208,
         320
       ],
       "id": "25218921-5aec-4b5a-8c04-92ecfbfa51b7",
@@ -470,7 +471,7 @@
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
       "position": [
-        -420,
+        -416,
         80
       ],
       "id": "870e4ccb-c77a-4eef-af5a-2da8c047d811",
@@ -492,47 +493,6 @@
     },
     {
       "parameters": {
-        "model": "qwen3:8b-q4_K_M",
-        "options": {
-          "format": "json"
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmOllama",
-      "typeVersion": 1,
-      "position": [
-        200,
-        700
-      ],
-      "id": "53bca64c-212a-4f85-a34a-9fbb68cc6c45",
-      "name": "Ollama Model",
-      "credentials": {
-        "ollamaApi": {
-          "id": "er9UBfBKoRVqOkGC",
-          "name": "Ollama account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "model": "nomic-embed-text:latest"
-      },
-      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
-      "typeVersion": 1,
-      "position": [
-        1040,
-        540
-      ],
-      "id": "0ca25f85-85fb-4a9a-8b1a-293b4bbc76a0",
-      "name": "Embeddings Ollama",
-      "credentials": {
-        "ollamaApi": {
-          "id": "er9UBfBKoRVqOkGC",
-          "name": "Ollama account"
-        }
-      }
-    },
-    {
-      "parameters": {
         "content": "[![The AI Automators](https://www.theaiautomators.com/wp-content/uploads/2025/03/gray-logo.png)](https://www.theaiautomators.com/)\n## InsightsLM Local - Upsert to Vector Store\nhttps://github.com/theaiautomators/insights-lm-public\nhttps://github.com/theaiautomators/insights-lm-local-package",
         "height": 260,
         "width": 300,
@@ -541,11 +501,48 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        40,
-        -40
+        48,
+        -48
       ],
       "id": "e04befbc-d931-4849-8778-a93b832c1004",
       "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        128,
+        528
+      ],
+      "id": "8f278a0c-93dd-475c-b78a-0544cb994fe5",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "JUjXarPUY9EoEB7c",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        992,
+        592
+      ],
+      "id": "cb3222e4-8dbd-4bac-9784-4d43d5f13908",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "JUjXarPUY9EoEB7c",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -562,6 +559,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2025-07-31T04:43:23.764Z",
-  "versionId": "9371b231-4055-4097-b572-d3449228f187"
+  "updatedAt": "2025-08-04T02:36:51.559Z",
+  "versionId": "8188d71e-ffea-4c53-b10a-95f2e67daecb"
 }
