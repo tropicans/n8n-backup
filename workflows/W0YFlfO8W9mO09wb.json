@@ -78,17 +78,6 @@
         ]
       ]
     },
-    "Ollama Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "Basic LLM Chain",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Generate Local Audio": {
       "main": [
         [
@@ -106,6 +95,17 @@
           {
             "node": "Basic LLM Chain",
             "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
             "index": 0
           }
         ]
@@ -131,8 +131,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -1940,
-        340
+        -1936,
+        352
       ],
       "id": "8e699fa4-ea2a-4fd7-87be-e0779e3ef149",
       "name": "Webhook",
@@ -162,14 +162,14 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        -1720,
-        340
+        -1728,
+        352
       ],
       "id": "c94ea89c-1a4a-4911-94b4-e5512884a0a9",
       "name": "Get Sources",
       "credentials": {
         "supabaseApi": {
-          "id": "FLQTzRBk2pJi894u",
+          "id": "VputCyUE7lFqpFDA",
           "name": "Supabase account"
         }
       }
@@ -184,8 +184,8 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        -1500,
-        340
+        -1504,
+        352
       ],
       "id": "0ac0a7f7-ce65-4670-8035-2287f79e016d",
       "name": "Aggregate"
@@ -199,8 +199,8 @@
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.7,
       "position": [
-        -1060,
-        340
+        -1056,
+        352
       ],
       "id": "3cd0b3e1-f080-4978-8b29-6657833b0e38",
       "name": "Basic LLM Chain",
@@ -239,11 +239,11 @@
       "typeVersion": 4.1,
       "position": [
         -464,
-        340
+        352
       ],
       "credentials": {
         "supabaseApi": {
-          "id": "FLQTzRBk2pJi894u",
+          "id": "VputCyUE7lFqpFDA",
           "name": "Supabase account"
         }
       }
@@ -262,14 +262,14 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -244,
-        340
+        -240,
+        352
       ],
       "id": "0581c5c0-2fd9-4d1f-98e9-aa84f3b78ed4",
       "name": "Generate Signed URL",
       "credentials": {
         "supabaseApi": {
-          "id": "FLQTzRBk2pJi894u",
+          "id": "VputCyUE7lFqpFDA",
           "name": "Supabase account"
         }
       }
@@ -281,8 +281,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -24,
-        340
+        -32,
+        352
       ],
       "id": "ceb82407-1ef9-4a01-894a-0eebe1d60511",
       "name": "Generate Timestamp for Expires"
@@ -297,33 +297,11 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -1960,
+        -1968,
         0
       ],
       "id": "582b715f-8400-447e-a986-7faf3ca27bbd",
       "name": "Sticky Note8"
-    },
-    {
-      "parameters": {
-        "model": "qwen3:8b-q4_K_M",
-        "options": {
-          "numCtx": 10000
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmOllama",
-      "typeVersion": 1,
-      "position": [
-        -1060,
-        540
-      ],
-      "id": "687d0fca-df37-41ec-8b8e-726a98ff7545",
-      "name": "Ollama Model",
-      "credentials": {
-        "ollamaApi": {
-          "id": "er9UBfBKoRVqOkGC",
-          "name": "Ollama account"
-        }
-      }
     },
     {
       "parameters": {
@@ -352,8 +330,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -684,
-        340
+        -688,
+        352
       ],
       "id": "fa93d85d-2577-4b87-a821-22af989497b0",
       "name": "Generate Local Audio"
@@ -366,7 +344,7 @@
       "typeVersion": 2,
       "position": [
         -1280,
-        340
+        352
       ],
       "id": "27c58c60-35b6-4577-b1cf-3fa14ef66fd7",
       "name": "Truncate Sources"
@@ -404,14 +382,14 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        196,
-        340
+        208,
+        352
       ],
       "id": "054c3972-3250-40ee-b9dc-aabb79f8f1f5",
       "name": "Update a row",
       "credentials": {
         "supabaseApi": {
-          "id": "FLQTzRBk2pJi894u",
+          "id": "VputCyUE7lFqpFDA",
           "name": "Supabase account"
         }
       }
@@ -425,8 +403,8 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -1320,
-        200
+        -1328,
+        208
       ],
       "id": "b8b0530d-a1c7-4417-88af-631ef997b3d4",
       "name": "Sticky Note"
@@ -440,11 +418,31 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -740,
-        200
+        -736,
+        208
       ],
       "id": "b7b664b4-becf-4574-a0ad-f8554748bcdd",
       "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-pro-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1072,
+        608
+      ],
+      "id": "506c2fdd-ee4a-4781-ac9d-93da8ac2a133",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "JUjXarPUY9EoEB7c",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -461,6 +459,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2025-07-31T04:43:21.360Z",
-  "versionId": "83926e36-4f9e-443b-879f-61b8b2fae24b"
+  "updatedAt": "2025-08-04T02:38:47.606Z",
+  "versionId": "05021077-8255-427c-b471-ddb6b587133f"
 }
